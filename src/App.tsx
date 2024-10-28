@@ -7,16 +7,21 @@ import { data } from './data/data';
 
 import { FeatureCollection } from 'geojson';
 import Canvas from './components/CanvasMap/Canvas';
+import Board from './components/Board/Board';
+import BoardContextProvider from './contexts/boardContexts';
 
 function App() {
 
   // const GeoData = JSON.parse(data)
 
   return (
-    <div className='map-window'>
-      <Canvas />
+    <BoardContextProvider>
+      <div className='map-window'>
+        <Board />
 
-    </div>
+      </div>
+
+    </BoardContextProvider>
   );
 }
 
