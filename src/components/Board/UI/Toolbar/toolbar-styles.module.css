@@ -10,3 +10,7 @@
     height: 50px;
   }
 }
+
+.active {
+  background-color: aliceblue;
+}

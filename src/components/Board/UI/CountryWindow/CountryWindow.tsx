@@ -1,5 +1,5 @@
-import { useContext } from "react";
-import { ICountry, ICountryForm } from "../../../../types/CountriesTypes";
+import { useContext, useEffect, useState } from "react";
+import { ICountry } from "../../../../types/CountriesTypes";
 import styles from "./country-window.styles.module.css"
 import { BoardContext } from "../../../../contexts/boardContexts";
 
@@ -8,9 +8,14 @@ interface IProps {
     country: ICountry;
 }
 
+const defaultColour = "#e7e7e7"
+
 export default function CountryWindow({ width, country }: IProps) {
 
-    const { editSelectedCountry } = useContext(BoardContext)
+    const { editCountry, setSelectedCountry, selectedCountry } = useContext(BoardContext)
+
+    const [inputColour, setInputColour] = useState<string>(defaultColour)
+
 
     // const onFormChange = (event: React.FormEvent) => {
 
@@ -22,23 +27,39 @@ export default function CountryWindow({ width, country }: IProps) {
 
     // }
 
-    console.log("selected country: ", country)
+    useEffect(() => {
+
+    }, [inputColour])
+
+    useEffect(() => {
+
+        if (selectedCountry !== null && selectedCountry.fillHexColour) {
+            setInputColour(selectedCountry.fillHexColour)
+        } else {
+            setInputColour(defaultColour)
+        }
+    }, [selectedCountry])
+
 
     return (
         <div className={styles["country-window"]} style={{ left: width / 2, bottom: 0 }}>
+            <div className="flex flex-row-reverse">
+                <button onClick={() => setSelectedCountry(null)}>X</button>
+            </div>
             <input
                 type="color"
                 name=""
                 id=""
-                value={country.fillHexColour || "#e7e7e7"}
-                // value={country && country.fillHexColour ? country.fillHexColour : "#e66465"}
+                value={inputColour}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputColour(event.target.value)}
                 onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
                     console.log(event.target.value)
-                    const countryForm: ICountryForm = {
-                        countryId: country.countryId,
+                    const countryForm: ICountry = {
+                        id: country.id,
+                        name: country.name,
                         fillHexColour: event.target.value
                     }
-                    editSelectedCountry(countryForm)
+                    editCountry(countryForm)
 
                 }}
             // onInput={(event: React.ChangeEvent<HTMLInputElement>) => { console.log(event.target.value) }}

@@ -1,19 +1,23 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useState } from "react";
 import { ICountry, ICountryForm } from "../types/CountriesTypes";
 import { data } from "../data/data"
 
 type BoardContextType = {
     selectedCountry: ICountry | null;
-    setSelectedCountry: (countryId: string) => void
-    editSelectedCountry: (country: ICountryForm) => void
+    setSelectedCountry: (countryId: string | null) => void
+    editCountry: (country: ICountry) => void
     countryList: ICountry[]
+    currentColour: string;
+    setCurrentColour: (hexColour: string) => void
 }
 
 export const BoardContext = createContext<BoardContextType>({
     selectedCountry: null,
-    setSelectedCountry: (countryId: string) => { },
-    editSelectedCountry: (country: ICountryForm) => { },
-    countryList: []
+    setSelectedCountry: (countryId: string | null) => { },
+    editCountry: (country: ICountry) => { },
+    countryList: [],
+    currentColour: "",
+    setCurrentColour: (hexColour: string) => { }
 })
 
 type IProps = {
@@ -23,16 +27,18 @@ type IProps = {
 export default function BoardContextProvider({ children }: IProps) {
     const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null);
     const [countryList, setCountryList] = useState<ICountry[]>([])
+    const [currentColour, setCurrentColour] = useState<string>("#4c00ff")
 
-    const setCountryHandler = (countryId: string) => {
+    const setCountryHandler = (countryId: string | null) => {
 
         const featureFound = data.features.find(feature => feature.id === countryId)
 
-        if (featureFound && featureFound.properties && featureFound.id) {
+
+        if (countryId !== null && featureFound && featureFound.properties && featureFound.id) {
 
             const id = typeof featureFound.id === "number" ? featureFound.id.toString() : featureFound.id;
 
-            const countryExists = countryList.find(c => c.countryId === countryId)
+            const countryExists = countryList.find(c => c.id === countryId)
 
             if (countryExists) {
 
@@ -40,48 +46,41 @@ export default function BoardContextProvider({ children }: IProps) {
 
             } else {
                 const country: ICountry = {
-                    countryId: id,
-                    countryName: featureFound.properties.name,
+                    id: id,
+                    name: featureFound.properties.name,
                     fillHexColour: null
                 }
-
                 setSelectedCountry(country)
             }
-
-
+        } else {
+            setSelectedCountry(null)
         }
     }
 
-    const editCountryHandler = (countryForm: ICountryForm) => {
+    const editCountryHandler = (countryForm: ICountry) => {
 
-        if (selectedCountry) {
+        const countryExists = countryList.find(c => c.id === countryForm.id)
 
-            const countryExists = countryList.find(c => c.countryId === countryForm.countryId)
+        if (countryExists) {
 
-            if (countryExists) {
-                countryExists.fillHexColour = selectedCountry.fillHexColour
-                const countryIndex = countryList.findIndex(c => c.countryId === countryForm.countryId)
+            countryExists.fillHexColour = countryForm.fillHexColour
+            const countryIndex = countryList.findIndex(c => c.id === countryForm.id)
 
-                countryList[countryIndex] = countryExists;
+            countryList[countryIndex] = countryExists;
 
-                setCountryList(countryList)
+            setCountryList([...countryList])
 
-            } else {
-                const newCountry: ICountry = {
-                    countryId: selectedCountry.countryId,
-                    countryName: selectedCountry.countryName,
-                    fillHexColour: countryForm.fillHexColour
-                }
+        } else {
 
-                console.log("newCountry: ", newCountry)
-                setCountryList([...countryList, newCountry])
-            }
-
+            setCountryList([...countryList, countryForm])
         }
-
     }
 
-    return <BoardContext.Provider value={{ selectedCountry, setSelectedCountry: setCountryHandler, editSelectedCountry: editCountryHandler, countryList }}>
+    const setColourHandler = (hexColour: string) => {
+        setCurrentColour(hexColour)
+    }
+
+    return <BoardContext.Provider value={{ selectedCountry, setSelectedCountry: setCountryHandler, editCountry: editCountryHandler, countryList, currentColour, setCurrentColour: setColourHandler }}>
         {children}
 
     </BoardContext.Provider>
