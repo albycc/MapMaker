@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import Canvas from "../CanvasMap/Canvas";
 import CountryWindow from "./UI/CountryWindow/CountryWindow";
 import Toolbar from "./UI/Toolbar/Toolbar";
@@ -6,21 +6,28 @@ import { BoardContext } from "../../contexts/boardContexts";
 import MenuBar from "./UI/MenuBar/MenuBar";
 import VisibleOption from "./UI/VisibleOption/VisibleOption";
 import ListButton from "./UI/List/ListButton";
+import { ToolbarOption } from "./UI/Toolbar/Toolbar-types";
 
+const width = window.innerWidth;
+const height = window.innerHeight
 
 export default function Board() {
 
     const { selectedCountry } = useContext(BoardContext)
+    const [toolBarOption, setToolBarOption] = useState<ToolbarOption>(ToolbarOption.Select)
 
-    const width = window.innerWidth;
-    const height = window.innerHeight
+    const onToolBarSelectedHandler = (toolbarOption: ToolbarOption) => {
+        setToolBarOption(toolbarOption)
+
+    }
+
 
     return <div>
         <MenuBar />
         <VisibleOption />
-        <Toolbar />
+        <Toolbar onToolbarSelected={onToolBarSelectedHandler} />
         <ListButton />
-        <Canvas width={width} height={height} />
-        {selectedCountry && <CountryWindow width={width} country={selectedCountry} />}
+        <Canvas width={width} height={height} toolBarMode={toolBarOption} />
+        {selectedCountry && toolBarOption === ToolbarOption.Select ? <CountryWindow width={width} country={selectedCountry} /> : ""}
     </div>
 }

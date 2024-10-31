@@ -4,14 +4,14 @@ import { data } from "../data/data"
 
 type BoardContextType = {
     selectedCountry: ICountry | null;
-    setSelectedCountry: (countryId: string) => void
+    setSelectedCountry: (countryId: string | null) => void
     editSelectedCountry: (country: ICountryForm) => void
     countryList: ICountry[]
 }
 
 export const BoardContext = createContext<BoardContextType>({
     selectedCountry: null,
-    setSelectedCountry: (countryId: string) => { },
+    setSelectedCountry: (countryId: string | null) => { },
     editSelectedCountry: (country: ICountryForm) => { },
     countryList: []
 })
@@ -24,11 +24,12 @@ export default function BoardContextProvider({ children }: IProps) {
     const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null);
     const [countryList, setCountryList] = useState<ICountry[]>([])
 
-    const setCountryHandler = (countryId: string) => {
+    const setCountryHandler = (countryId: string | null) => {
 
         const featureFound = data.features.find(feature => feature.id === countryId)
 
-        if (featureFound && featureFound.properties && featureFound.id) {
+
+        if (countryId !== null && featureFound && featureFound.properties && featureFound.id) {
 
             const id = typeof featureFound.id === "number" ? featureFound.id.toString() : featureFound.id;
 
@@ -44,11 +45,10 @@ export default function BoardContextProvider({ children }: IProps) {
                     countryName: featureFound.properties.name,
                     fillHexColour: null
                 }
-
                 setSelectedCountry(country)
             }
-
-
+        } else {
+            setSelectedCountry(null)
         }
     }
 
