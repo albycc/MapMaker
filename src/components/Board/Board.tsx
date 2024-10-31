@@ -7,6 +7,7 @@ import MenuBar from "./UI/MenuBar/MenuBar";
 import VisibleOption from "./UI/VisibleOption/VisibleOption";
 import ListButton from "./UI/List/ListButton";
 import { ToolbarOption } from "./UI/Toolbar/Toolbar-types";
+import Paintwindow from "./UI/PaintWindow/PaintWindow";
 
 const width = window.innerWidth;
 const height = window.innerHeight
@@ -29,5 +30,6 @@ export default function Board() {
         <ListButton />
         <Canvas width={width} height={height} toolBarMode={toolBarOption} />
         {selectedCountry && toolBarOption === ToolbarOption.Select ? <CountryWindow width={width} country={selectedCountry} /> : ""}
+        {toolBarOption === ToolbarOption.Paint ? <Paintwindow width={width} /> : ""}
     </div>
 }

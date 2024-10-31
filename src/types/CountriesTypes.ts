@@ -1,6 +1,6 @@
 export interface ICountry {
-  countryId: string;
-  countryName: string;
+  id: string;
+  name: string;
   fillHexColour: string | null;
 }
 

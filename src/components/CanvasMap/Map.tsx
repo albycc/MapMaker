@@ -5,6 +5,7 @@ import { MouseEventHandler, useContext, useEffect, useState } from "react";
 
 import { BoardContext } from "../../contexts/boardContexts";
 import { ToolbarOption } from "../Board/UI/Toolbar/Toolbar-types";
+import { ICountry, ICountryForm } from "../../types/CountriesTypes";
 
 // import data from "../data/custom.geo.json"
 
@@ -19,19 +20,17 @@ export default function Map({ width, height, data, toolBarOption }: IMapProps) {
 
     const [mouseOverCountry, setMouseOverCountry] = useState<string | number>("");
 
-    const { selectedCountry, setSelectedCountry, countryList } = useContext(BoardContext)
+    const { selectedCountry, setSelectedCountry, countryList, editCountry, currentColour } = useContext(BoardContext)
 
     // add a projection so d3 will convert what type of map we shall see
     // scale will zoom the map
     // translate will move the map x or y
     const projection = d3.geoEquirectangular().center([-100, 100]).scale(300).translate([400, 0])
 
-    console.log("countryList: ", countryList)
-
     const fillCountryColour = (c: Feature) => {
         let fillColour = "#e7e7e7";
 
-        const countryFound = countryList.find(cntr => cntr.countryId === c.id);
+        const countryFound = countryList.find(cntr => cntr.id === c.id);
 
         if (countryFound && countryFound.fillHexColour) {
             fillColour = countryFound.fillHexColour
@@ -52,9 +51,21 @@ export default function Map({ width, height, data, toolBarOption }: IMapProps) {
                         stroke="#7f7f7f"
                         fill={fillCountryColour(c)}
                         strokeWidth={c.id === mouseOverCountry ? 2 : 0.4}
+                        cursor={"Pointer"}
+                        onClick={() => {
+                            if (c.id) {
+                                const id = typeof c.id === "number" ? c.id.toString() : c.id;
+                                const countryForm: ICountry = {
+                                    id,
+                                    name: c.properties?.name,
+                                    fillHexColour: currentColour
+                                }
+                                editCountry(countryForm)
+
+                            }
+                        }}
                         onMouseOver={() => {
                             if (c.id) {
-                                console.log("c.id: ", c.id)
                                 setMouseOverCountry(c.id)
 
                             }
@@ -67,15 +78,10 @@ export default function Map({ width, height, data, toolBarOption }: IMapProps) {
                         key={c.id}
                         data-id={c.id}
                         d={geoPath().projection(projection)(c)?.toString()}
-                        stroke={selectedCountry?.countryId === c.id || c.id === mouseOverCountry ? "#f32121" : "#7f7f7f"}
+                        stroke={selectedCountry?.id === c.id ? "#f32121" : "#7f7f7f"}
                         fill={fillCountryColour(c)}
-                        strokeWidth={c.id === selectedCountry?.countryId ? 2 : 0.4}
-                        onClick={() => {
-                            if (c.id) {
-                                const id = typeof c.id === "number" ? c.id.toString() : c.id;
-                                setSelectedCountry(id)
-                            }
-                        }}
+                        strokeWidth={selectedCountry?.id === c.id || c.id === mouseOverCountry ? 2 : 0.4}
+
                         cursor={"Pointer"}
                         onMouseOver={() => {
                             if (c.id)

@@ -28,7 +28,6 @@ export default function Toolbar({ onToolbarSelected }: IProps) {
     }, [selected])
 
 
-    console.log(selected)
 
     return <div className={styles["toolbar"]} style={{ left: 50, top: 400 }}>
         {buttons.map(b => <button key={b} value={b} className={selected === b ? styles.active : ""} onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
