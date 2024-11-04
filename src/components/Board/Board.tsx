@@ -8,6 +8,8 @@ import VisibleOption from "./UI/VisibleOption/VisibleOption";
 import ListButton from "./UI/List/ListButton";
 import { ToolbarOption } from "./UI/Toolbar/Toolbar-types";
 import Paintwindow from "./UI/PaintWindow/PaintWindow";
+import LegendWindow from "./UI/Legend/LegendWindow";
+import { LegendContext } from "../../contexts/legendContexts";
 
 const width = window.innerWidth;
 const height = window.innerHeight
@@ -15,6 +17,7 @@ const height = window.innerHeight
 export default function Board() {
 
     const { selectedCountry } = useContext(BoardContext)
+    const { legend } = useContext(LegendContext)
     const [toolBarOption, setToolBarOption] = useState<ToolbarOption>(ToolbarOption.Select)
 
     const onToolBarSelectedHandler = (toolbarOption: ToolbarOption) => {
@@ -28,6 +31,7 @@ export default function Board() {
         <VisibleOption />
         <Toolbar onToolbarSelected={onToolBarSelectedHandler} />
         <ListButton />
+        <LegendWindow toolbarOption={toolBarOption} />
         <Canvas width={width} height={height} toolBarMode={toolBarOption} />
         {selectedCountry && toolBarOption === ToolbarOption.Select ? <CountryWindow width={width} country={selectedCountry} /> : ""}
         {toolBarOption === ToolbarOption.Paint ? <Paintwindow width={width} /> : ""}

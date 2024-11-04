@@ -9,6 +9,7 @@ import { FeatureCollection } from 'geojson';
 import Canvas from './components/CanvasMap/Canvas';
 import Board from './components/Board/Board';
 import BoardContextProvider from './contexts/boardContexts';
+import LegendContextProvider from './contexts/legendContexts';
 
 function App() {
 
@@ -16,10 +17,13 @@ function App() {
 
   return (
     <BoardContextProvider>
-      <div className='map-window'>
-        <Board />
+      <LegendContextProvider>
+        <div className='map-window'>
+          <Board />
 
-      </div>
+        </div>
+
+      </LegendContextProvider>
 
     </BoardContextProvider>
   );
