@@ -9,7 +9,7 @@ type ILegendContextType = {
     createLegend: () => void,
     addLegendColour: (newColour: string) => void,
     editLegendRow: (oldColour: string, newColour: string, newLabel: string) => void,
-    removeLegendColour: (legendIndex: number) => void
+    removeLegendColour: (legendId: string) => void
     deleteLegend: () => void,
     title: string,
     setTitle: (newTitle: string) => void
@@ -20,7 +20,7 @@ export const LegendContext = createContext<ILegendContextType>({
     createLegend: () => { },
     addLegendColour: (newColour: string) => { },
     editLegendRow: (oldColour: string, newColour: string, newLabel: string) => { },
-    removeLegendColour: (legendIndex: number) => { },
+    removeLegendColour: (legendId: string) => { },
     deleteLegend: () => { },
     title: "",
     setTitle: (newTitle: string) => { }
@@ -50,6 +50,7 @@ export default function LegendContextProvider({ children }: IProps) {
                 return
             }
             const newLegend: ILegend = {
+                id: Math.random().toString().slice(2),
                 label: "",
                 colour: newColour
             }
@@ -58,40 +59,45 @@ export default function LegendContextProvider({ children }: IProps) {
         }
     }
 
-    const editLegendRow = (oldcolour: string, newColour: string, newLabel: string) => {
+    const editLegendRow = (LegendRowId: string, newColour: string, newLabel: string) => {
 
-        console.log("oldColour: " + oldcolour, " newColour: ", newColour, " newLabel: ", newLabel)
 
         if (legend !== null) {
-            const index = legend.findIndex(l => l.colour === oldcolour)
-
+            const index = legend.findIndex(l => l.id === LegendRowId)
 
             if (index !== -1) {
-                console.log("index found: ", index)
 
+                const existingColourFound = legend.find((l) => l.colour === newColour && LegendRowId !== l.id)
+
+                if (existingColourFound) {
+                    console.log("Warning! Could not create new label because there are two matching colours. Choose another colour.")
+                    return
+                }
 
                 const oldColour = legend[index].colour
 
-                legend[index] = {
-                    colour: newColour,
-                    label: newLabel
-                }
-                console.log("legend row changed: ", legend[index])
+                legend[index].colour = newColour;
+                legend[index].label = newLabel;
 
                 setLegend([...legend])
 
-                const countriesThatUseThatOldColour: ICountry[] = countryList.filter(c => c.fillHexColour === oldColour)
+                if (oldColour !== newColour) {
+                    const countriesThatUseThatOldColour: ICountry[] = countryList.filter(c => c.fillHexColour === oldColour).map(c => { return { ...c, fillHexColour: newColour } })
 
-                editCountryList(countriesThatUseThatOldColour)
+                    editCountryList(countriesThatUseThatOldColour)
+
+                }
+
             }
 
         }
 
     }
 
-    const removeLegendColourHandler = (legendIndex: number) => {
+    const removeLegendColourHandler = (legendId: string) => {
         if (legend !== null) {
-            setLegend(legend.splice(legendIndex + 1, 1))
+            setLegend([...legend.filter(l => l.id !== legendId)])
+
 
         }
     }

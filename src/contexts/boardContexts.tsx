@@ -30,7 +30,7 @@ type IProps = {
 export default function BoardContextProvider({ children }: IProps) {
     const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null);
     const [countryList, setCountryList] = useState<ICountry[]>([])
-    const [currentColour, setCurrentColour] = useState<string>("#4c00ff")
+    const [currentColour, setCurrentColour] = useState<string>("#0015ff")
 
     const setCountryHandler = (countryId: string | null) => {
 
@@ -63,16 +63,11 @@ export default function BoardContextProvider({ children }: IProps) {
         const newCountryList: ICountry[] = [...countryList]
 
         newCountries.forEach(c => {
-            const index = countryList.findIndex(cl => cl.id === c.id)
+            const index = newCountryList.findIndex(cl => cl.id === c.id)
             if (index !== -1) {
                 newCountryList[index].fillHexColour = c.fillHexColour
-            } else {
-                newCountryList.push(c)
             }
         })
-
-
-
 
         setCountryList(newCountryList)
     }

@@ -9,7 +9,6 @@ import ListButton from "./UI/List/ListButton";
 import { ToolbarOption } from "./UI/Toolbar/Toolbar-types";
 import Paintwindow from "./UI/PaintWindow/PaintWindow";
 import LegendWindow from "./UI/Legend/LegendWindow";
-import { LegendContext } from "../../contexts/legendContexts";
 
 const width = window.innerWidth;
 const height = window.innerHeight
@@ -17,7 +16,6 @@ const height = window.innerHeight
 export default function Board() {
 
     const { selectedCountry } = useContext(BoardContext)
-    const { legend } = useContext(LegendContext)
     const [toolBarOption, setToolBarOption] = useState<ToolbarOption>(ToolbarOption.Select)
 
     const onToolBarSelectedHandler = (toolbarOption: ToolbarOption) => {
