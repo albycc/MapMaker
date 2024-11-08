@@ -47,6 +47,8 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
 
     }
 
+    console.log("drawn canvas")
+
     return <div className={styles["canvas-container"] + toolBarMode === ToolbarOption.Paint ? styles["paint-cursor"] : ""}>
         <svg width={width} height={height} onClick={clickHandler}>
             {selectedCountry ? <text x={width / 2} y={100}>{selectedCountry.name}</text> : ""}
