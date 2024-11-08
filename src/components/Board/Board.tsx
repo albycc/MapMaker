@@ -20,9 +20,9 @@ export default function Board() {
 
     const onToolBarSelectedHandler = (toolbarOption: ToolbarOption) => {
         setToolBarOption(toolbarOption)
-
     }
 
+    console.log("render board")
 
     return <div>
         <MenuBar />
