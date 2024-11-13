@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import styles from "./paintwindow-styles.module.css"
-import { BoardContext } from "../../../../contexts/boardContexts";
+import { BoardContext } from "../../../../../contexts/boardContexts";
 
 
 interface IProps {

@@ -1,6 +1,8 @@
 import { FeatureCollection } from "geojson";
 
-export const data: FeatureCollection = {
+export interface FeatureCollectionExt extends FeatureCollection {}
+
+export const data: FeatureCollectionExt = {
   type: "FeatureCollection",
   features: [
     {

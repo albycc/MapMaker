@@ -3,20 +3,42 @@ import { useState } from "react"
 import styles from "./menubar-styles.module.css"
 import MenuBarLegend from "./MeuBarItems/MenuBarLegend";
 import WindowCard from "../globals/WindowCard";
+import Icon from "../globals/Icon";
 
-const menus = ["Map", "Import", "Export"]
+import mapIcon from "../../../../icons/menubar/map.png"
+import listIcon from "../../../../icons/menubar/list.png"
+import exportimportIcon from "../../../../icons/menubar/exportimport.png"
+
+const menus = [{
+    label: "Map",
+    file: mapIcon
+},
+{
+    label: "List",
+    file: listIcon
+},
+{
+    label: "Import/Export",
+    file: exportimportIcon
+}]
 
 export default function MenuBar() {
 
     const [activeMenu, setActiveMenu] = useState<string>("");
 
     return (
-        <div className="absolute" style={{ left: "50%", top: 10 }}>
-            <WindowCard position={{ left: "50%", top: 10 }}>
-                <div className="flex">
-                    {menus.map((menu) => <button key={menu} className={menu === activeMenu ? "bg-cyan-100" : ""} onClick={() => setActiveMenu(activeMenu === menu ? "" : menu)}>{menu}</button>)}
-                </div>
-            </WindowCard>
+        <div className="absolute" style={{ right: 30, top: 20 }} >
+            <div className="flex">
+                {menus.map((menu) => (
+                    <button
+                        key={menu.label}
+                        className={menu.label === activeMenu ? "bg-cyan-100" : ""}
+                        onClick={() => setActiveMenu(activeMenu === menu.label ? "" : menu.label)}>
+                        <Icon file={menu.file} size={50} />
+                    </button>
+                ))}
+
+            </div>
             <div className="relative">
             </div>
         </div>

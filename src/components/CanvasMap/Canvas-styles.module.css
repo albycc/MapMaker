@@ -1,5 +1,5 @@
 .canvas-container {
   &.brush-cursor {
-    cursor: url("../../icons/brush.png"), auto;
+    /* cursor: url("../../icons/brush.png"), auto; */
   }
 }

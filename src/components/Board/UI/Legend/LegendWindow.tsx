@@ -6,14 +6,11 @@ import { ToolbarOption } from "../Toolbar/Toolbar-types";
 import { BoardContext } from "../../../../contexts/boardContexts";
 import deleteIcon from "../../../../icons/delete_icon.png"
 import LegendWindowStyles from "./LegendWindowStyles";
+import { Position } from "../../../types/Position";
 
 interface IProps {
-    toolbarOption: ToolbarOption
-}
-
-type Position = {
-    x: number,
-    y: number,
+    toolbarOption: ToolbarOption,
+    initialPosition: Position
 }
 
 const legendStyles: ILegendStyles = {
@@ -29,7 +26,7 @@ const legendStyles: ILegendStyles = {
     spaceBetweenRows: 5
 }
 
-export default function LegendWindow({ toolbarOption }: IProps) {
+export default function LegendWindow({ toolbarOption, initialPosition }: IProps) {
 
 
     const { setCurrentColour, currentColour } = useContext(BoardContext)
@@ -55,6 +52,11 @@ export default function LegendWindow({ toolbarOption }: IProps) {
     const [displayStyles, setDisplayStyles] = useState<boolean>(false)
 
     const [legendStyle, setLegendStyle] = useState<ILegendStyles>(legendStyles)
+
+    useEffect(() => {
+        setPosition({ x: initialPosition.x, y: initialPosition.y })
+
+    }, [])
 
 
     useEffect(() => {
@@ -110,122 +112,109 @@ export default function LegendWindow({ toolbarOption }: IProps) {
     }
 
     return (
-        <>
-            {legend !== null ? (
+        <div className="absolute flex" style={{ left: position.x - positionOffset.x, top: position.y - positionOffset.y }}>
+            <div className="px-3 py-2 w-full max-w-56 cursor-move" id="legend"
+                onClick={onLegendWindowClick}
+                onMouseMove={onMouseMove}
+                style={{
+                    borderColor: legendStyle.borderColor,
+                    borderWidth: legendStyle.borderWidth,
+                    borderRadius: legendStyle.borderRound,
+                    backgroundColor: legendStyle.backgroundColor,
+                    padding: legendStyle.framePadding
+                }}
+            >
+                <div className="cursor-pointer">
+                    <div className="flex justify-center my-2">
+                        <textarea
+                            ref={titleTextArea}
+                            className=" text-center font-bold overflow-y-hidden w-full resize-none bg-transparent"
+                            placeholder="Add title here"
+                            value={legendTitle}
+                            onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+                                setLegendTitle(event.target.value)
+                                calcTextAreaHeight()
+                            }}
+                            onBlur={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+                                setTitle(event.target.value)
+                            }}
+                            style={{
+                                height: textAreaHeight,
+                                fontSize: legendStyle.titleSize,
+                                color: legendStyle.fontColor
+                            }}
+                        >
+                        </textarea>
+                    </div>
+                    <ul>
+                        {legend && legend.map(({ id, colour, label }) => (
+                            <li
+                                key={id}
+                                className={"flex justify-between " + (isPaintMode ? "hover:bg-cyan-200" : "")}
+                                style={{ marginTop: legendStyle.spaceBetweenRows }}
 
-                <div className="absolute flex" style={{ left: position.x - positionOffset.x, top: position.y - positionOffset.y }}>
-                    <div className="px-3 py-2 w-full max-w-56 cursor-move" id="legend"
-                        onClick={onLegendWindowClick}
-                        onMouseMove={onMouseMove}
-                        style={{
-                            borderColor: legendStyle.borderColor,
-                            borderWidth: legendStyle.borderWidth,
-                            borderRadius: legendStyle.borderRound,
-                            backgroundColor: legendStyle.backgroundColor,
-                            padding: legendStyle.framePadding
-                        }}
-                    >
-                        <div className="cursor-pointer">
-                            <div className="flex justify-center my-2">
-                                <textarea
-                                    ref={titleTextArea}
-                                    className=" text-center font-bold overflow-y-hidden w-full resize-none bg-transparent"
-                                    placeholder="Add title here"
-                                    value={legendTitle}
-                                    onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                                        setLegendTitle(event.target.value)
-                                        calcTextAreaHeight()
-                                    }}
-                                    onBlur={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                                        setTitle(event.target.value)
-                                    }}
-                                    style={{
-                                        height: textAreaHeight,
-                                        fontSize: legendStyle.titleSize,
-                                        color: legendStyle.fontColor
-                                    }}
-                                >
-                                </textarea>
-                            </div>
-                            <ul>
-                                {legend && legend.map(({ id, colour, label }) => (
-                                    <li
-                                        key={id}
-                                        className={"flex justify-between " + (isPaintMode ? "hover:bg-cyan-200" : "")}
-                                        style={{ marginTop: legendStyle.spaceBetweenRows }}
-
-                                    >
+                            >
+                                <input
+                                    className="w-5 cursor-pointer bg-transparent"
+                                    value={colour}
+                                    type="color"
+                                    id={"l-" + id}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setColourChanged(event.target.value)}
+                                    onBlur={() => editLegendRow(id, colourChanged, label)}
+                                    style={{ color: legendStyle.fontColor }}
+                                />
+                                {isPaintMode ?
+                                    <button
+                                        className="w-full text-left"
+                                        style={{ color: legendStyle.fontColor }}
+                                        onClick={() => { setCurrentColour(colour) }}>{label}</button>
+                                    :
+                                    <>
                                         <input
-                                            className="w-5 cursor-pointer bg-transparent"
-                                            value={colour}
-                                            type="color"
-                                            id={"l-" + id}
-                                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setColourChanged(event.target.value)}
-                                            onBlur={() => editLegendRow(id, colourChanged, label)}
+                                            className="w-full bg-transparent"
+                                            type="text"
+                                            placeholder="Insert label"
+                                            value={label}
+                                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                                editLegendRow(id, colour, event.target.value)
+                                            }}
+                                            onBlur={() => setFocusOnNewInput(false)}
+                                            autoFocus={focusOnNewInput}
                                             style={{ color: legendStyle.fontColor }}
                                         />
-                                        {isPaintMode ?
-                                            <button
-                                                className="w-full text-left"
-                                                style={{ color: legendStyle.fontColor }}
-                                                onClick={() => { setCurrentColour(colour) }}>{label}</button>
-                                            :
-                                            <>
-                                                <input
-                                                    className="w-full bg-transparent"
-                                                    type="text"
-                                                    placeholder="Insert label"
-                                                    value={label}
-                                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                                        editLegendRow(id, colour, event.target.value)
-                                                    }}
-                                                    onBlur={() => setFocusOnNewInput(false)}
-                                                    autoFocus={focusOnNewInput}
-                                                    style={{ color: legendStyle.fontColor }}
-                                                />
-                                                <div className="w-4">
-                                                    <button onClick={() => removeLegendColour(id)}>
-                                                        <img src={deleteIcon} alt="D" />
-                                                    </button>
-                                                </div>
-                                            </>
-                                        }
-                                    </li>
-                                ))}
-                                {!isPaintMode ? <li className="flex" style={{ marginTop: legendStyle.spaceBetweenRows }}>
-                                    <input
-                                        className="w-5 grow-0 bg-transparent"
-                                        type="color"
-                                        value={newColour}
-                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                            setNewColour(event.target.value)
-                                        }} />
-                                    <button className="text-slate-400" onClick={() => {
+                                        <div className="w-4">
+                                            <button onClick={() => removeLegendColour(id)}>
+                                                <img src={deleteIcon} alt="D" />
+                                            </button>
+                                        </div>
+                                    </>
+                                }
+                            </li>
+                        ))}
+                        {!isPaintMode ? <li className="flex" style={{ marginTop: legendStyle.spaceBetweenRows }}>
+                            <input
+                                className="w-5 grow-0 bg-transparent"
+                                type="color"
+                                value={newColour}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                    setNewColour(event.target.value)
+                                }} />
+                            <button className="text-slate-400" onClick={() => {
 
-                                        addLegendColour(newColour)
-                                        setFocusOnNewInput(true);
+                                addLegendColour(newColour)
+                                setFocusOnNewInput(true);
 
-                                    }}>Add new label</button>
-                                </li> : null}
-                            </ul>
-                        </div>
-                    </div>
-                    {displayStyles ? <LegendWindowStyles values={legendStyle} onChange={onLegendStylesChange} close={() => setDisplayStyles(false)} />
-                        :
-                        <div className=" ml-2">
-                            <button onClick={() => setDisplayStyles(true)}>S</button>
-                        </div>}
-
+                            }}>Add new label</button>
+                        </li> : null}
+                    </ul>
                 </div>
+            </div>
+            {displayStyles ? <LegendWindowStyles values={legendStyle} onChange={onLegendStylesChange} close={() => setDisplayStyles(false)} />
+                :
+                <div className=" ml-2">
+                    <button onClick={() => setDisplayStyles(true)}>S</button>
+                </div>}
 
-
-            ) :
-                (
-                    <div className="absolute rounded-2xl border-slate-300 border-2 px-3 py-2 w-full max-w-56" style={{ left: 10, top: 500 }}>
-                        <button className="text-slate-400" onClick={() => createLegend()}>Create new Legend</button>
-
-                    </div>
-                )}
-        </>
+        </div>
     )
 }

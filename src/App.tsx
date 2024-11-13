@@ -18,7 +18,7 @@ function App() {
   return (
     <BoardContextProvider>
       <LegendContextProvider>
-        <div className='map-window'>
+        <div className="overflow-hidden w-screen h-screen ">
           <Board />
 
         </div>
