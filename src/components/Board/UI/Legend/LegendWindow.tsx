@@ -55,6 +55,7 @@ export default function LegendWindow({ toolbarOption, initialPosition }: IProps)
 
     useEffect(() => {
         setPosition({ x: initialPosition.x, y: initialPosition.y })
+        createLegend()
 
     }, [])
 
@@ -200,6 +201,8 @@ export default function LegendWindow({ toolbarOption, initialPosition }: IProps)
                                     setNewColour(event.target.value)
                                 }} />
                             <button className="text-slate-400" onClick={() => {
+
+                                console.log(newColour)
 
                                 addLegendColour(newColour)
                                 setFocusOnNewInput(true);

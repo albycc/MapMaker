@@ -55,6 +55,7 @@ export default function LegendContextProvider({ children }: IProps) {
                 label: "",
                 colour: newColour
             }
+
             setLegend([...legend, newLegend])
 
         }

@@ -8,6 +8,9 @@ import Icon from "../globals/Icon";
 import mapIcon from "../../../../icons/menubar/map.png"
 import listIcon from "../../../../icons/menubar/list.png"
 import exportimportIcon from "../../../../icons/menubar/exportimport.png"
+import MapWindowOptions from "./MenuBarWindows/MapWindowOptions";
+import ListWindowOptions from "./MenuBarWindows/ListWindowOptions";
+import ExportImportWindowOptions from "./MenuBarWindows/ExportImportWindowOptions";
 
 const menus = [{
     label: "Map",
@@ -40,6 +43,9 @@ export default function MenuBar() {
 
             </div>
             <div className="relative">
+                {activeMenu === "Map" && <MapWindowOptions />}
+                {activeMenu === "List" && <ListWindowOptions />}
+                {activeMenu === "Import/Export" && <ExportImportWindowOptions />}
             </div>
         </div>
     )
