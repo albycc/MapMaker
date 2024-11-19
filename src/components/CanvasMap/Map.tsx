@@ -1,23 +1,27 @@
 import * as d3 from "d3"
 import { geoPath } from "d3-geo";
 import { Feature, FeatureCollection } from "geojson";
-import React, { MouseEventHandler, useContext, useEffect, useState } from "react";
+import React, { forwardRef, useContext, useState } from "react";
 
 import { BoardContext } from "../../contexts/boardContexts";
 import { ToolbarOption } from "../Board/UI/Toolbar/Toolbar-types";
-import { ICountry, ICountryForm } from "../../types/CountriesTypes";
+import { ICountry } from "../../types/CountriesTypes";
 import { FeatureCollectionExt } from "../../data/data";
+import { Position } from "../types/Position";
 
 // import data from "../data/custom.geo.json"
 
 type IMapProps = {
     width: number;
     height: number;
-    data: FeatureCollectionExt
-    toolBarOption: ToolbarOption
+    data: FeatureCollectionExt;
+    toolBarOption: ToolbarOption;
+    scrollPosition: Position;
+    zoomPosition: number;
+
 }
 
-export default function Map({ width, height, data, toolBarOption }: IMapProps) {
+const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBarOption, scrollPosition, zoomPosition }: IMapProps, ref) => {
 
     const [mouseOverCountry, setMouseOverCountry] = useState<string | number>("");
 
@@ -28,7 +32,9 @@ export default function Map({ width, height, data, toolBarOption }: IMapProps) {
     // add a projection so d3 will convert what type of map we shall see
     // scale will zoom the map
     // translate will move the map x or y
-    const projection = d3.geoEquirectangular().center([-100, 100]).scale(300).translate([400, 0])
+    const projection = d3.geoEquirectangular().center([0, 0]).scale(zoomPosition).translate([scrollPosition.x, scrollPosition.y])
+
+    const graticule = d3.geoGraticule10();
 
 
     const fillCountryColour = (c: Feature) => {
@@ -65,7 +71,10 @@ export default function Map({ width, height, data, toolBarOption }: IMapProps) {
 
 
     return (
-        <>
+        <svg ref={ref}>
+            <g>
+                <path d={geoPath(projection)(graticule)?.toString()} stroke="#ccc" fill="none"></path>
+            </g>
             <g>
                 {countries.features.map((c, i) =>
                     <path
@@ -88,6 +97,9 @@ export default function Map({ width, height, data, toolBarOption }: IMapProps) {
                     />)}
             </g>
 
-        </>
+
+        </svg>
     )
-}
+})
+
+export default Map

@@ -1,7 +1,7 @@
 import Map from "./Map"
 import { data } from "../../data/data"
 import * as d3 from "d3"
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { BoardContext } from "../../contexts/boardContexts";
 import styles from "./Canvas-styles.module.css"
 import { ToolbarOption } from "../Board/UI/Toolbar/Toolbar-types";
@@ -16,6 +16,8 @@ interface IProps {
     toolBarMode: ToolbarOption;
 }
 
+const scrollSpeed = 25
+
 
 export default function Canvas({ width, height, toolBarMode }: IProps) {
 
@@ -25,30 +27,39 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
     const [initTextElement, setInitTextElement] = useState<IText | null>(null) //checks when user clicks on canvas with create text tool
     const [sprites, setSprites] = useState<ISprite[]>([])
 
+    const [scrollPosition, setScrollPosition] = useState<Position>({ x: width / 2, y: height / 2 })
+    const [scrollInitPosition, setScrollInitPosition] = useState<Position>(scrollPosition)
+    const [zoomPosition, setZoomPosition] = useState<number>(100)
+    const [zoomPositionMax, setZoomPositionMax] = useState<number>(zoomPosition)
+
+    const mapSVG = useRef<SVGSVGElement>(null)
+
+    const [scrollCanvasMode, setScrollCanvasMode] = useState<boolean>(false)
 
     useEffect(() => {
+        if (mapSVG.current !== null) {
+            const svgWidth = mapSVG.current.getBoundingClientRect().width
+            const scale = width / svgWidth * 100
 
-        const lastElement = textElements[textElements.length - 1]
-
-        if (lastElement) {
-            const id = lastElement.id;
-
-
+            console.log(scale)
+            setZoomPositionMax(scale)
+            setZoomPosition(scale)
         }
-    }, [textElements])
+
+    }, [])
 
     // x axis
 
 
-    useEffect(() => {
-        console.log("draw grid")
-        var x = d3.scaleLinear().range([0, width]).domain([0, 100000]);
-        // d3.select("#gridlines")
-        //     .append("g")
-        //     .call(d3.axisBottom(x).ticks(10).tickSizeInner(-height))
+    // useEffect(() => {
+    //     console.log("draw grid")
+    //     var x = d3.scaleLinear().range([0, width]).domain([0, 100000]);
+    //     // d3.select("#gridlines")
+    //     //     .append("g")
+    //     //     .call(d3.axisBottom(x).ticks(10).tickSizeInner(-height))
 
 
-    }, [])
+    // }, [])
 
     const clickHandler = (event: React.MouseEvent<SVGSVGElement>) => {
 
@@ -96,9 +107,7 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
                 height: h
             }
 
-
             setSprites([...sprites, sprite])
-
         }
         // else if (toolBarMode === ToolbarOption.Legend) {
         //     const element = document.getElementById("board")
@@ -125,8 +134,6 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
             textList[textElementIndex].text = text
 
             setTextElements(textList)
-
-
         }
 
     }
@@ -137,41 +144,95 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
             initTextElement.text = text
             setTextElements([...textElements, initTextElement])
             setInitTextElement(null)
-
         }
     }
 
-    console.log("drawn canvas")
+    const zoomPositionHandler = (event: React.WheelEvent<HTMLDivElement>) => {
 
-    return <div className={styles["canvas-container"] + toolBarMode === ToolbarOption.Paint ? styles["paint-cursor"] : ""}>
-        <svg width={width} height={height} onClick={clickHandler}>
-            {selectedCountry ? <text x={width / 2} y={100}>{selectedCountry.name}</text> : ""}
-            <Map width={width} height={height} data={data} toolBarOption={toolBarMode} />
-            <g id="gridlines" width={width} height={height}></g>
-            {sprites.map(s => <SpriteElement src={s.src} position={s.position} width={s.width} height={s.height} />)}
 
-            {textElements.map(t => (
-                <TextElement
-                    id={t.id}
-                    position={t.position}
-                    text={t.text}
-                    onTextFinished={onTextFinished}
+        if (event.deltaY > 0) {
+            if (zoomPosition <= zoomPositionMax)
+                setZoomPosition(zoomPositionMax)
+            else
+                setZoomPosition(zoomPosition - scrollSpeed)
+        }
+        else
+            setZoomPosition(zoomPosition + scrollSpeed)
+    }
 
+    const scrollPositionDownHandler = (event: React.MouseEvent) => {
+
+        if (event.button === 1) {
+            console.log("down")
+            setScrollCanvasMode(true)
+        }
+    }
+
+    const scrollPositionUpHandler = (event: React.MouseEvent) => {
+
+        if (event.button === 1) {
+            setScrollCanvasMode(false)
+            console.log("up")
+            setScrollInitPosition(scrollPosition)
+        }
+        console.log("scrollPosition: ", scrollPosition)
+    }
+
+    function moveMouseHandler(event: React.MouseEvent<HTMLDivElement>) {
+
+        if (scrollCanvasMode) {
+            const offsetX = scrollInitPosition.x + (event.clientX - scrollInitPosition.x)
+            const offsetY = scrollInitPosition.y + (event.clientY - scrollInitPosition.y)
+            console.log("offsetX: ", offsetX)
+            console.log("offsetY: ", offsetY)
+            setScrollPosition({ x: offsetX, y: offsetY })
+        }
+    }
+
+    return (
+        <div
+            className={styles["canvas-container"] + toolBarMode === ToolbarOption.Paint ? styles["paint-cursor"] : ""}
+            onWheel={zoomPositionHandler}
+            onMouseDown={scrollPositionDownHandler}
+            onMouseUp={scrollPositionUpHandler}
+            onMouseMove={moveMouseHandler}
+        >
+            <svg width={width} height={height} onClick={clickHandler}>
+                {selectedCountry ? <text x={width / 2} y={100}>{selectedCountry.name}</text> : ""}
+                <Map
+                    width={width}
+                    height={height}
+                    data={data}
+                    toolBarOption={toolBarMode}
+                    scrollPosition={scrollPosition}
+                    zoomPosition={zoomPosition}
+                    ref={mapSVG}
                 />
+                {sprites.map(s => <SpriteElement src={s.src} position={s.position} width={s.width} height={s.height} />)}
 
-            ))}
-            {initTextElement && (
-                <TextElement
-                    id={initTextElement.id}
-                    position={initTextElement.position}
-                    text={initTextElement.text}
-                    onTextFinished={onTextFinished}
-                    initText={(text) => { text !== "" ? insertTextElementHandler(text) : setInitTextElement(null) }}
-                />
-            )}
+                {textElements.map(t => (
+                    <TextElement
+                        id={t.id}
+                        position={t.position}
+                        text={t.text}
+                        onTextFinished={onTextFinished}
 
-        </svg>
+                    />
 
-    </div>
+                ))}
+                {initTextElement && (
+                    <TextElement
+                        id={initTextElement.id}
+                        position={initTextElement.position}
+                        text={initTextElement.text}
+                        onTextFinished={onTextFinished}
+                        initText={(text) => { text !== "" ? insertTextElementHandler(text) : setInitTextElement(null) }}
+                    />
+                )}
+
+            </svg>
+
+        </div>
+    )
 
 }
