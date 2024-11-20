@@ -28,7 +28,7 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
     const [sprites, setSprites] = useState<ISprite[]>([])
 
     const [scrollPosition, setScrollPosition] = useState<Position>({ x: width / 2, y: height / 2 })
-    const [scrollInitPosition, setScrollInitPosition] = useState<Position>(scrollPosition)
+    const [scrollMouseDistance, setScrollMouseDistance] = useState<Position>({ x: 0, y: 0 })
     const [zoomPosition, setZoomPosition] = useState<number>(100)
     const [zoomPositionMax, setZoomPositionMax] = useState<number>(zoomPosition)
 
@@ -41,7 +41,6 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
             const svgWidth = mapSVG.current.getBoundingClientRect().width
             const scale = width / svgWidth * 100
 
-            console.log(scale)
             setZoomPositionMax(scale)
             setZoomPosition(scale)
         }
@@ -163,8 +162,10 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
     const scrollPositionDownHandler = (event: React.MouseEvent) => {
 
         if (event.button === 1) {
-            console.log("down")
             setScrollCanvasMode(true)
+            const offsetX = scrollPosition.x - event.clientX
+            const offsetY = scrollPosition.y - event.clientY
+            setScrollMouseDistance({ x: offsetX, y: offsetY })
         }
     }
 
@@ -172,20 +173,15 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
 
         if (event.button === 1) {
             setScrollCanvasMode(false)
-            console.log("up")
-            setScrollInitPosition(scrollPosition)
         }
-        console.log("scrollPosition: ", scrollPosition)
     }
 
     function moveMouseHandler(event: React.MouseEvent<HTMLDivElement>) {
 
         if (scrollCanvasMode) {
-            const offsetX = scrollInitPosition.x + (event.clientX - scrollInitPosition.x)
-            const offsetY = scrollInitPosition.y + (event.clientY - scrollInitPosition.y)
-            console.log("offsetX: ", offsetX)
-            console.log("offsetY: ", offsetY)
-            setScrollPosition({ x: offsetX, y: offsetY })
+            const x = event.clientX + scrollMouseDistance.x
+            const y = event.clientY + scrollMouseDistance.y
+            setScrollPosition({ x, y })
         }
     }
 
