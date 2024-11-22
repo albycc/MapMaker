@@ -3,5 +3,6 @@ export enum ToolbarOption {
   Paint = "Paint",
   Sprite = "Sprite",
   Text = "Text",
+  Image = "Image",
   Legend = "Legend",
 }

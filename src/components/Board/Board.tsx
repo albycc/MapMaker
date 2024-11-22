@@ -19,6 +19,12 @@ export default function Board() {
     const [legendInitPosition, setLegendInitPosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
     const [toolBarOption, setToolBarOption] = useState<ToolbarOption>(ToolbarOption.Select)
 
+    useEffect(() => {
+
+        window.addEventListener("contextmenu", e => e.preventDefault())
+
+    }, [])
+
     // useEffect(() => {
 
     //     if (toolBarOption === ToolbarOption.Legend) {
@@ -55,7 +61,6 @@ export default function Board() {
         <div id="options-position">
 
             {selectedCountry && toolBarOption === ToolbarOption.Select ? <CountryWindow width={width} country={selectedCountry} /> : ""}
-            {toolBarOption === ToolbarOption.Paint ? <Paintwindow width={width} /> : ""}
         </div>
         {showLegend && <LegendWindow toolbarOption={toolBarOption} initialPosition={{ x: legendInitPosition.x, y: legendInitPosition.y }} />}
         <Canvas width={width} height={height} toolBarMode={toolBarOption} />

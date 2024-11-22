@@ -8,7 +8,10 @@ import selectIcon from "../../../../icons/toolbar/select.png"
 import brushIcon from "../../../../icons/toolbar/brush.png"
 import spritesIcon from "../../../../icons/toolbar/sprites.png"
 import textIcon from "../../../../icons/toolbar/text.png"
+import imageIcon from "../../../../icons/toolbar/image.png"
 import legendIcon from "../../../../icons/toolbar/legend.png"
+import ToolbarOptionsWindow from "./ToolbarOptionsWindows/ToolbarOptionsWindow"
+import ToolbarOptionsBrush from "./ToolbarOptionsWindows/ToolbarOptionsBrush"
 
 const buttons = [
     {
@@ -20,10 +23,6 @@ const buttons = [
         file: brushIcon
     },
     {
-        label: "Sprite",
-        file: spritesIcon
-    },
-    {
         label: "Text",
         file: textIcon
     },
@@ -31,6 +30,7 @@ const buttons = [
         label: "Legend",
         file: legendIcon
     },
+
 ]
 
 interface IProps {
@@ -52,29 +52,35 @@ export default function Toolbar({ onToolbarSelected }: IProps) {
 
     }, [selectedToolbar])
 
+    const menuItemClickedHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+
+        const target = event.currentTarget as any
+
+        const label: ToolbarOption = target.value
 
 
-    return <WindowCard position={{ left: 50, top: 400 }}>
-        <div className="flex flex-col">
-            {buttons.map(b => (
-                <button
-                    key={b.label}
-                    value={b.label}
-                    className={selectedToolbar === b.label ? styles.active : ""}
-                    onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+        setSelectedToolbar(Object.keys(ToolbarOption)[Object.values(ToolbarOption).indexOf(label)] as ToolbarOption)
 
-                        const target = event.currentTarget as any
+    }
 
-                        const label: ToolbarOption = target.value
+    return (
+        <div className="absolute" style={{ left: "50%", top: 20 }}>
+            <WindowCard position={{ left: 0, top: 0 }}>
+                <div className="flex">
+                    {buttons.map(b => (
+                        <button
+                            key={b.label}
+                            value={b.label}
+                            className={selectedToolbar === b.label ? styles.active : ""}
+                            onClick={menuItemClickedHandler}>
+                            {b.file ? <Icon file={b.file} size={25} /> : null}
+                        </button>
+                    ))}
 
-
-                        setSelectedToolbar(Object.keys(ToolbarOption)[Object.values(ToolbarOption).indexOf(label)] as ToolbarOption)
-
-                    }}>
-                    <Icon file={b.file} size={25} />
-                </button>
-            ))}
+                </div>
+            </WindowCard>
+            {selectedToolbar === ToolbarOption.Paint ? <ToolbarOptionsBrush /> : null}
 
         </div>
-    </WindowCard>
+    )
 }
