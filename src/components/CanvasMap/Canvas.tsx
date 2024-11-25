@@ -195,7 +195,6 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
             onMouseMove={moveMouseHandler}
         >
             <svg width={width} height={height} onClick={clickHandler} id="svg-canvas">
-                {selectedCountry ? <text x={width / 2} y={100}>{selectedCountry.name}</text> : ""}
                 <Map
                     width={width}
                     height={height}

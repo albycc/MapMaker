@@ -3,6 +3,7 @@ import { ICountry } from "../../../../../types/CountriesTypes";
 import styles from "./country-window.styles.module.css"
 import { BoardContext } from "../../../../../contexts/boardContexts";
 import { ToolbarContext } from "../../../../../contexts/toolbarContexts";
+import WindowCard from "../../globals/WindowCard";
 
 interface IProps {
     width: number;
@@ -18,16 +19,7 @@ export default function CountryWindow({ width, country }: IProps) {
 
     const [inputColour, setInputColour] = useState<string>(defaultColour)
 
-
-    // const onFormChange = (event: React.FormEvent) => {
-
-    //     event.preventDefault()
-
-    //     console.log(event)
-
-    //     // const formData = new FormData(event.target)
-
-    // }
+    console.log("selectedCountry ", selectedCountry)
 
     useEffect(() => {
 
@@ -42,42 +34,65 @@ export default function CountryWindow({ width, country }: IProps) {
         }
     }, [selectedCountry])
 
+    const onLabelChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+        if (selectedCountry) {
+            const editedCountry: ICountry = {
+                id: selectedCountry.id,
+                name: selectedCountry.name,
+                fillColour: selectedCountry.fillColour,
+                label: event.currentTarget.value
+
+            }
+
+            editCountry(editedCountry)
+
+        }
+    }
 
     return (
-        <div className={styles["country-window"]} style={{ left: width / 2, bottom: 0 }}>
-            <div className="flex flex-row-reverse">
-                <button onClick={() => setSelectedCountry(null)}>X</button>
-            </div>
-            <div className="flex">
-                <div className="flex flex-col">
-                    <p>Colour</p>
-                    <input
-                        type="color"
-                        name=""
-                        id=""
-                        value={inputColour}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputColour(event.target.value)}
-                        onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            console.log(event.target.value)
-                            const countryForm: ICountry = {
-                                id: country.id,
-                                name: country.name,
-                                fillColour: event.target.value
-                            }
-                            editCountry(countryForm)
-
-                        }}
-                    // onInput={(event: React.ChangeEvent<HTMLInputElement>) => { console.log(event.target.value) }}
-                    // onBlur={(event: React.ChangeEvent<HTMLInputElement>) => { console.log(event.target.value) }}
-                    />
-
+        <WindowCard position={{ left: width / 2, bottom: 0 }} >
+            {selectedCountry ? (<div className="flex flex-col mx-3">
+                <div className="flex">
+                    <h2 className="w-full text-center text-xl ">{selectedCountry?.name}</h2>
+                    <button onClick={() => setSelectedCountry(null)}>X</button>
                 </div>
-                <div className="flex flex-col">
-                    <p>Text</p>
-                    <input type="text" name="" id="" />
+                <div className="flex">
+                    <div className="flex flex-col">
+                        {typeof selectedCountry.fillColour !== "string" && selectedCountry.fillColour ? (
+                            <>
+                                <p>Image</p>
+                                <img src={selectedCountry.fillColour.src} alt="" className="w-24" />
+                            </>
+                        ) : (
+                            <>
+                                <p>Colour</p>
+                                <input
+                                    type="color"
+                                    name=""
+                                    id=""
+                                    value={inputColour}
+                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputColour(event.target.value)}
+                                    onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                        console.log(event.target.value)
+                                        const countryForm: ICountry = {
+                                            id: country.id,
+                                            name: country.name,
+                                            fillColour: event.target.value
+                                        }
+                                        editCountry(countryForm)
+                                    }}
+                                />
+                            </>
+                        )}
+                    </div>
+                    <div className="flex flex-col">
+                        <p className="text-center">Label</p>
+                        <input type="text" name="" id="" value={selectedCountry.label} onChange={onLabelChangeHandler} />
 
+                    </div>
                 </div>
-            </div>
-        </div>
+            </div>) : <></>}
+        </WindowCard>
     )
 }

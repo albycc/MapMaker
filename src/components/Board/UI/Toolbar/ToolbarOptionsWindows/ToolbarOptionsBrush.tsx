@@ -112,7 +112,7 @@ export default function ToolbarOptionsBrush() {
                     </>
                 ) : (
                     <div>
-                        <div className="flex flex-wrap">
+                        <div className="flex flex-wrap items-start overflow-y-auto h-20">
                             {images.map((image) => {
                                 return (
                                     <button className={currentImage && currentImage.label === image.label ? "border border-b-slate-900" : "m-1"} key={image.label} onClick={onClickImageHandler} data-key={image.label}>
@@ -120,7 +120,7 @@ export default function ToolbarOptionsBrush() {
                                     </button>
                                 )
                             })}
-                            <label htmlFor="select-image" className="bg-slate-200 px-2 py-1 cursor-pointer border rounded-lg">
+                            <label htmlFor="select-image" className="bg-slate-100 px-3 py-1 h-10 cursor-pointer border rounded-lg text-lg">
                                 <input
                                     className="hidden"
                                     type="file"
@@ -130,17 +130,12 @@ export default function ToolbarOptionsBrush() {
                                     onChange={imageSelectorHandler}
                                 />
                                 +
-
                             </label>
-
                         </div>
-
-
                     </div>
                 )}
 
             </div>
-
         </div>
     )
 }

@@ -58,6 +58,7 @@ export default function BoardContextProvider({ children }: IProps) {
             const index = newCountryList.findIndex(cl => cl.id === c.id)
             if (index !== -1) {
                 newCountryList[index].fillColour = c.fillColour
+                newCountryList[index].label = c.label
             }
         })
 
@@ -71,6 +72,7 @@ export default function BoardContextProvider({ children }: IProps) {
         if (countryExists) {
 
             countryExists.fillColour = countryForm.fillColour
+            countryExists.label = countryForm.label
             const countryIndex = countryList.findIndex(c => c.id === countryForm.id)
             countryList[countryIndex] = countryExists;
             setCountryList([...countryList])
@@ -85,9 +87,12 @@ export default function BoardContextProvider({ children }: IProps) {
 
         const countryExists = countryList.find(c => c.id === countryId)
 
+
         if (countryExists) {
-            setCountryList([...countryList.filter(c => c.id !== countryId)])
+            setCountryList([...countryList.filter(c => c.id !== countryExists.id)])
         }
+
+        console.log(countryList)
 
     }
 
