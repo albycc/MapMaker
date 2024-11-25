@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { ICountry } from "../../../../../types/CountriesTypes";
 import styles from "./country-window.styles.module.css"
 import { BoardContext } from "../../../../../contexts/boardContexts";
+import { ToolbarContext } from "../../../../../contexts/toolbarContexts";
 
 interface IProps {
     width: number;
@@ -12,7 +13,8 @@ const defaultColour = "#e7e7e7"
 
 export default function CountryWindow({ width, country }: IProps) {
 
-    const { editCountry, setSelectedCountry, selectedCountry } = useContext(BoardContext)
+    const { editCountry } = useContext(BoardContext)
+    const { setSelectedCountry, selectedCountry } = useContext(ToolbarContext)
 
     const [inputColour, setInputColour] = useState<string>(defaultColour)
 
@@ -33,8 +35,8 @@ export default function CountryWindow({ width, country }: IProps) {
 
     useEffect(() => {
 
-        if (selectedCountry !== null && selectedCountry.fillHexColour) {
-            setInputColour(selectedCountry.fillHexColour)
+        if (selectedCountry !== null && selectedCountry.fillColour && typeof selectedCountry.fillColour === "string") {
+            setInputColour(selectedCountry.fillColour)
         } else {
             setInputColour(defaultColour)
         }
@@ -60,7 +62,7 @@ export default function CountryWindow({ width, country }: IProps) {
                             const countryForm: ICountry = {
                                 id: country.id,
                                 name: country.name,
-                                fillHexColour: event.target.value
+                                fillColour: event.target.value
                             }
                             editCountry(countryForm)
 

@@ -32,7 +32,6 @@ type IProps = {
 
 export default function LegendContextProvider({ children }: IProps) {
     const [legend, setLegend] = useState<ILegend[] | null>(null)
-    const [showLegend, setShowLegend] = useState<boolean>(false)
     const [title, setTitle] = useState<string>("");
     const { countryList, editCountryList } = useContext(BoardContext)
 
@@ -84,7 +83,7 @@ export default function LegendContextProvider({ children }: IProps) {
                 setLegend([...legend])
 
                 if (oldColour !== newColour) {
-                    const countriesThatUseThatOldColour: ICountry[] = countryList.filter(c => c.fillHexColour === oldColour).map(c => { return { ...c, fillHexColour: newColour } })
+                    const countriesThatUseThatOldColour: ICountry[] = countryList.filter(c => c.fillColour === oldColour).map(c => { return { ...c, fillHexColour: newColour } })
 
                     editCountryList(countriesThatUseThatOldColour)
 

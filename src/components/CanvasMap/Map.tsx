@@ -8,6 +8,9 @@ import { ToolbarOption } from "../Board/UI/Toolbar/Toolbar-types";
 import { ICountry } from "../../types/CountriesTypes";
 import { FeatureCollectionExt } from "../../data/data";
 import { Position } from "../types/Position";
+import { ToolbarContext } from "../../contexts/toolbarContexts";
+import { COLOURS } from "../../constants/colours";
+import { Img } from "../types/Image";
 
 // import data from "../data/custom.geo.json"
 
@@ -27,7 +30,8 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
     const [countries, setCountries] = useState<FeatureCollection>(data)
 
-    const { selectedCountry, setSelectedCountry, countryList, editCountry, currentColour } = useContext(BoardContext)
+    const { currentColour, selectedCountry, setSelectedCountry, images } = useContext(ToolbarContext)
+    const { countryList, editCountry, removeCountryColour } = useContext(BoardContext)
 
     // add a projection so d3 will convert what type of map we shall see
     // scale will zoom the map
@@ -38,12 +42,18 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
 
     const fillCountryColour = (c: Feature) => {
-        let fillColour = "#e7e7e7";
+        let fillColour: string = COLOURS.defaultCountryColour
 
         const countryFound = countryList.find(cntr => cntr.id === c.id);
 
-        if (countryFound && countryFound.fillHexColour) {
-            fillColour = countryFound.fillHexColour
+        if (countryFound && countryFound.fillColour) {
+            if (typeof countryFound.fillColour === "string") {
+                fillColour = countryFound.fillColour
+
+            } else {
+                const id = countryFound.fillColour.label
+                fillColour = `url(#fillImg-${id})`
+            }
         }
 
         return fillColour
@@ -59,14 +69,32 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
             }
             if (toolBarOption === ToolbarOption.Paint) {
+
+                // right clicking removes country colour
+
+
                 const countryForm: ICountry = {
                     id,
                     name: name,
-                    fillHexColour: currentColour
+                    fillColour: currentColour
                 }
                 editCountry(countryForm)
             }
         }
+    }
+
+    const removeCountryColourHandler = (event: React.MouseEvent<SVGPathElement>) => {
+
+        event.preventDefault()
+
+        console.log("remove ", event.currentTarget.getAttribute("data-id"))
+
+        const id = event.currentTarget.getAttribute("data-id")
+
+        if (id)
+
+            removeCountryColour(id)
+
     }
 
 
@@ -87,6 +115,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
                         strokeWidth={(selectedCountry && selectedCountry.id === c.id) || (c.id === mouseOverCountry) ? 2 : 0.4}
                         cursor={"Pointer"}
                         onClick={countryOnClickHandler}
+                        onContextMenu={removeCountryColourHandler}
                         onMouseOver={() => {
                             if (c.id) {
                                 setMouseOverCountry(c.id)
@@ -95,6 +124,18 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
                         }}
                         onMouseLeave={() => { setMouseOverCountry("") }}
                     />)}
+            </g>
+            <g>
+                {images.map(i => {
+                    return (
+                        <defs>
+                            <pattern id={"fillImg-" + i.label} patternUnits="userSpaceOnUse" width="400px" height="400px">
+                                <image href={i.src} x="0" y="0" width="400px" height="400px" />
+                            </pattern>
+                        </defs>
+
+                    )
+                })}
             </g>
 
 

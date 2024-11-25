@@ -10,6 +10,7 @@ import Canvas from './components/CanvasMap/Canvas';
 import Board from './components/Board/Board';
 import BoardContextProvider from './contexts/boardContexts';
 import LegendContextProvider from './contexts/legendContexts';
+import ToolbarContextProvider from './contexts/toolbarContexts';
 
 function App() {
 
@@ -17,13 +18,16 @@ function App() {
 
   return (
     <BoardContextProvider>
-      <LegendContextProvider>
-        <div className="overflow-hidden w-screen h-screen ">
-          <Board />
+      <ToolbarContextProvider>
+        <LegendContextProvider>
+          <div className="overflow-hidden w-screen h-screen ">
+            <Board />
 
-        </div>
+          </div>
 
-      </LegendContextProvider>
+        </LegendContextProvider>
+
+      </ToolbarContextProvider>
 
     </BoardContextProvider>
   );

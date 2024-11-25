@@ -7,6 +7,7 @@ import { BoardContext } from "../../../../contexts/boardContexts";
 import deleteIcon from "../../../../icons/delete_icon.png"
 import LegendWindowStyles from "./LegendWindowStyles";
 import { Position } from "../../../types/Position";
+import { ToolbarContext } from "../../../../contexts/toolbarContexts";
 
 interface IProps {
     toolbarOption: ToolbarOption,
@@ -29,8 +30,8 @@ const legendStyles: ILegendStyles = {
 export default function LegendWindow({ toolbarOption, initialPosition }: IProps) {
 
 
-    const { setCurrentColour, currentColour } = useContext(BoardContext)
-    const [newColour, setNewColour] = useState<string>(currentColour)
+    const { setCurrentColour, currentColour } = useContext(ToolbarContext)
+    const [newColour, setNewColour] = useState<string>("")
     const [legendTitle, setLegendTitle] = useState<string>("")
 
     const { legend, addLegendColour, createLegend, removeLegendColour, editLegendRow, title, setTitle } = useContext(LegendContext)
@@ -56,6 +57,8 @@ export default function LegendWindow({ toolbarOption, initialPosition }: IProps)
     useEffect(() => {
         setPosition({ x: initialPosition.x, y: initialPosition.y })
         createLegend()
+        if (typeof currentColour === "string")
+            setNewColour(currentColour)
 
     }, [])
 

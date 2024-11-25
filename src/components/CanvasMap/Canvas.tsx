@@ -9,6 +9,7 @@ import { Position } from '../types/Position';
 import { ISprite, IText } from "./Elements/element-types";
 import TextElement from "./Elements/TextElement";
 import SpriteElement from "./Elements/SpriteElement";
+import { ToolbarContext } from "../../contexts/toolbarContexts";
 
 interface IProps {
     width: number;
@@ -21,7 +22,7 @@ const scrollSpeed = 25
 
 export default function Canvas({ width, height, toolBarMode }: IProps) {
 
-    const { selectedCountry, setSelectedCountry } = useContext(BoardContext)
+    const { selectedCountry, setSelectedCountry } = useContext(ToolbarContext)
     const [textElements, setTextElements] = useState<IText[]>([])
 
     const [initTextElement, setInitTextElement] = useState<IText | null>(null) //checks when user clicks on canvas with create text tool

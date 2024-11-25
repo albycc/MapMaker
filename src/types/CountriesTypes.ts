@@ -1,10 +1,12 @@
+import { Img } from "../components/types/Image";
+
 export interface ICountry {
   id: string;
   name: string;
-  fillHexColour: string | null;
+  fillColour: string | Img | null;
 }
 
 export interface ICountryForm {
   countryId: string;
-  fillHexColour: string | null;
+  fillColour: string | Img | null;
 }

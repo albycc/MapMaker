@@ -12,6 +12,7 @@ import imageIcon from "../../../../icons/toolbar/image.png"
 import legendIcon from "../../../../icons/toolbar/legend.png"
 import ToolbarOptionsWindow from "./ToolbarOptionsWindows/ToolbarOptionsWindow"
 import ToolbarOptionsBrush from "./ToolbarOptionsWindows/ToolbarOptionsBrush"
+import { ToolbarContext } from "../../../../contexts/toolbarContexts"
 
 const buttons = [
     {
@@ -39,7 +40,7 @@ interface IProps {
 
 export default function Toolbar({ onToolbarSelected }: IProps) {
     const [selectedToolbar, setSelectedToolbar] = useState<ToolbarOption>(ToolbarOption.Select)
-    const { setSelectedCountry } = useContext(BoardContext)
+    const { setSelectedCountry } = useContext(ToolbarContext)
     const [showLegend, setShowLegend] = useState<boolean>(false);
 
     useEffect(() => {

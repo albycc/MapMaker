@@ -1,21 +1,87 @@
 import { useContext, useEffect, useState } from "react"
 import { BoardContext } from "../../../../../contexts/boardContexts"
+import { Img } from "../../../../types/Image"
+import { ToolbarContext } from "../../../../../contexts/toolbarContexts"
 
 
 export default function ToolbarOptionsBrush() {
 
     const [usesBrush, setUsesBrush] = useState<boolean>(true)
-    const [inputColour, setInputColour] = useState<string>()
+    const { setCurrentColour, currentColour, images, addImage } = useContext(ToolbarContext)
+    const [inputHexColour, setInputHexColour] = useState<string>("")
+    const [currentImage, setCurrentImage] = useState<Img | null>(null)
 
-    const { setCurrentColour, currentColour } = useContext(BoardContext)
+    console.log("inputHexColour: ", inputHexColour)
+
 
     useEffect(() => {
 
-        setInputColour(currentColour)
+        if (typeof currentColour === "string") {
+
+            setInputHexColour(currentColour)
+        }
+        else {
+            setCurrentImage(currentColour)
+        }
 
     }, [currentColour])
 
-    console.log("currentColour: ", currentColour)
+    useEffect(() => {
+
+        if (usesBrush && inputHexColour !== "") {
+            setCurrentColour(inputHexColour)
+        } else if (!usesBrush && currentImage !== null) {
+            setCurrentColour(currentImage)
+        }
+
+    }, [usesBrush])
+
+
+    const imageSelectorHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+        const file = event.target.files
+
+        if (file) {
+
+            const fileReader = new FileReader();
+            const img: Img = {
+                label: file[0].name,
+                src: ""
+            }
+
+            fileReader.onload = function () {
+                const result = fileReader.result?.toString()
+
+                if (result) {
+                    img.src = result
+                }
+                if (!images.find(i => i.label === img.label))
+                    addImage(img)
+            }
+
+            fileReader.readAsDataURL(file[0])
+
+            console.log(file)
+        }
+    }
+
+    const onClickImageHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+
+        const key = event.currentTarget.getAttribute("data-key")
+
+        if (key) {
+            const img = images.find(i => i.label === key)
+
+            if (img) {
+                setCurrentImage(img)
+                setCurrentColour(img)
+
+            }
+
+        }
+
+
+    }
     return (
         <div className="absolute flex flex-col bg-orange-100 rounded-bl-md rounded-br-md p-2" style={{ top: 36, left: 0 }}>
             <div className="flex my-1">
@@ -36,8 +102,8 @@ export default function ToolbarOptionsBrush() {
                             type="color"
                             name=""
                             id=""
-                            value={inputColour}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputColour(event.target.value)}
+                            value={inputHexColour}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputHexColour(event.target.value)}
                             onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 console.log(event.target.value)
                                 setCurrentColour(event.target.value)
@@ -45,10 +111,32 @@ export default function ToolbarOptionsBrush() {
 
                     </>
                 ) : (
-                    <>
-                        <button>Select image</button>
+                    <div>
+                        <div className="flex flex-wrap">
+                            {images.map((image) => {
+                                return (
+                                    <button className={currentImage && currentImage.label === image.label ? "border border-b-slate-900" : "m-1"} key={image.label} onClick={onClickImageHandler} data-key={image.label}>
+                                        <img className="w-8 h-8" src={image.src} alt={image.label} />
+                                    </button>
+                                )
+                            })}
+                            <label htmlFor="select-image" className="bg-slate-200 px-2 py-1 cursor-pointer border rounded-lg">
+                                <input
+                                    className="hidden"
+                                    type="file"
+                                    name=""
+                                    id="select-image"
+                                    accept=".jpeg, .jpg, .png"
+                                    onChange={imageSelectorHandler}
+                                />
+                                +
 
-                    </>
+                            </label>
+
+                        </div>
+
+
+                    </div>
                 )}
 
             </div>
