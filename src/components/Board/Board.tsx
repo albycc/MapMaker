@@ -9,13 +9,14 @@ import Paintwindow from "./UI/OptionsWindows/PaintWindow/PaintWindowOptions";
 import LegendWindow from "./UI/Legend/LegendWindow";
 import { LegendContext } from "../../contexts/legendContexts";
 import { ToolbarContext } from "../../contexts/toolbarContexts";
+import { selectionIsCountry } from "../../utils/typeChecks";
 
 const width = window.innerWidth;
 const height = window.innerHeight
 
 export default function Board() {
 
-    const { selectedCountry } = useContext(ToolbarContext)
+    const { selected } = useContext(ToolbarContext)
     const [showLegend, setShowLegend] = useState<boolean>(false)
     const [legendInitPosition, setLegendInitPosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
     const [toolBarOption, setToolBarOption] = useState<ToolbarOption>(ToolbarOption.Select)
@@ -54,14 +55,14 @@ export default function Board() {
 
     console.log("render board")
 
-    return <div id="board" onClick={onBoardSelect} onContextMenu={(event: React.MouseEvent) => event.preventDefault()}>
+    return <div id="board" onClick={onBoardSelect} >
         <MenuBar />
-        <Toolbar onToolbarSelected={onToolBarSelectedHandler} />
+        <Toolbar />
         <div id="options-position">
 
-            {selectedCountry && toolBarOption === ToolbarOption.Select ? <CountryWindow width={width} country={selectedCountry} /> : ""}
+            {selectionIsCountry(selected) && toolBarOption === ToolbarOption.Select ? <CountryWindow width={width} country={selected} /> : ""}
         </div>
-        {showLegend && <LegendWindow toolbarOption={toolBarOption} initialPosition={{ x: legendInitPosition.x, y: legendInitPosition.y }} />}
-        <Canvas width={width} height={height} toolBarMode={toolBarOption} />
+        {showLegend && <LegendWindow initialPosition={{ x: legendInitPosition.x, y: legendInitPosition.y }} />}
+        <Canvas width={width} height={height} />
     </div>
 }

@@ -10,19 +10,19 @@ import { ISprite, IText } from "./Elements/element-types";
 import TextElement from "./Elements/TextElement";
 import SpriteElement from "./Elements/SpriteElement";
 import { ToolbarContext } from "../../contexts/toolbarContexts";
+import { selectionIsText } from "../../utils/typeChecks";
 
 interface IProps {
     width: number;
     height: number;
-    toolBarMode: ToolbarOption;
 }
 
 const scrollSpeed = 25
 
 
-export default function Canvas({ width, height, toolBarMode }: IProps) {
+export default function Canvas({ width, height }: IProps) {
 
-    const { selectedCountry, setSelectedCountry } = useContext(ToolbarContext)
+    const { setSelectedCountry, toolbarOption, setSelectedText, selected } = useContext(ToolbarContext)
     const [textElements, setTextElements] = useState<IText[]>([])
 
     const [initTextElement, setInitTextElement] = useState<IText | null>(null) //checks when user clicks on canvas with create text tool
@@ -32,6 +32,7 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
     const [scrollMouseDistance, setScrollMouseDistance] = useState<Position>({ x: 0, y: 0 })
     const [zoomPosition, setZoomPosition] = useState<number>(100)
     const [zoomPositionMax, setZoomPositionMax] = useState<number>(zoomPosition)
+    const [moveElement, setMoveElement] = useState<SVGElement | null>(null)
 
     const mapSVG = useRef<SVGSVGElement>(null)
 
@@ -48,6 +49,16 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
 
     }, [])
 
+    // useEffect(() => {
+
+    //     console.log(selected)
+
+    //     if (selectionIsText(selected)) {
+    //         d3.select(`#${selected.id}`).append("rect").attr()
+    //     }
+
+    // }, [selected])
+
     // x axis
 
 
@@ -61,20 +72,60 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
 
     // }, [])
 
-    const clickHandler = (event: React.MouseEvent<SVGSVGElement>) => {
+    const clickHandler = (event: React.MouseEvent<HTMLDivElement>) => {
 
-        if (toolBarMode === ToolbarOption.Select) {
-            const element = event.target as any
+        const target = event.target
 
-            const countryId = element.getAttribute("data-id")
+        if (toolbarOption === ToolbarOption.Select) {
 
-            console.log("data-id: ", element.getAttribute("data-id"))
-            if (countryId !== null) {
-                setSelectedCountry(countryId)
-            } else {
-                setSelectedCountry(null)
+            if (selectionIsText(selected) && moveElement instanceof SVGTextElement) {
+
+                const index = textElements.findIndex(t => t.id === selected.id)
+
+                console.log("index: ", index)
+
+
+                if (index !== -1) {
+                    console.log("drop it")
+
+                    const rect = moveElement.getBoundingClientRect()
+
+                    textElements[index].position = { x: rect.x, y: rect.y }
+
+                    setTextElements([...textElements])
+
+                    setMoveElement(null)
+                }
+
             }
-        } else if (toolBarMode === ToolbarOption.Text) {
+
+            else if (target instanceof SVGPathElement && target.getAttribute("data-countryid")) {
+                const countryId = target.getAttribute("data-countryid")
+                console.log("countryid: ", target.getAttribute("data-countryid"))
+                if (countryId !== null) {
+                    setSelectedCountry(countryId)
+                } else {
+                    setSelectedCountry(null)
+                }
+            } else if (target instanceof SVGTextElement) {
+                const text = textElements.find(t => t.id === target.id)
+
+                if (selectionIsText(selected) && target.id === selected.id) {
+                    console.log("time to move")
+                    setMoveElement(target)
+                } else if (text !== undefined) {
+                    console.log("text selected ", text)
+                    setSelectedText(text)
+                }
+            }
+
+        } else if (toolbarOption === ToolbarOption.Text) {
+
+            if (target instanceof SVGTextElement) {
+                const id = target.id
+
+            }
+
 
             const text: IText = {
                 id: "t-" + Math.random().toString().slice(2),
@@ -82,6 +133,7 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
                 colour: "black",
                 size: 10,
                 font: "Arial",
+                style: "normal",
                 position: {
                     x: event.clientX,
                     y: event.clientY
@@ -91,7 +143,7 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
             // setTextElements([...textElements, text])
 
 
-        } else if (toolBarMode === ToolbarOption.Sprite) {
+        } else if (toolbarOption === ToolbarOption.Sprite) {
 
             const w = 75
             const h = 75
@@ -179,6 +231,20 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
 
     function moveMouseHandler(event: React.MouseEvent<HTMLDivElement>) {
 
+
+        if (moveElement !== null) {
+            const rect = moveElement.getBoundingClientRect()
+
+            const offsetX = event.clientX - rect.x;
+            const offsetY = event.clientY - rect.y;
+
+            if (moveElement instanceof SVGTextElement) {
+                d3.select(`#${moveElement.id}`)
+                    .attr("x", rect.x + offsetX)
+                    .attr("y", rect.y + offsetY)
+            }
+        }
+
         if (scrollCanvasMode) {
             const x = event.clientX + scrollMouseDistance.x
             const y = event.clientY + scrollMouseDistance.y
@@ -188,18 +254,19 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
 
     return (
         <div
-            className={styles["canvas-container"] + toolBarMode === ToolbarOption.Paint ? styles["paint-cursor"] : ""}
+            className={styles["canvas-container"] + toolbarOption === ToolbarOption.Paint ? styles["paint-cursor"] : ""}
             onWheel={zoomPositionHandler}
             onMouseDown={scrollPositionDownHandler}
             onMouseUp={scrollPositionUpHandler}
             onMouseMove={moveMouseHandler}
+            onClick={clickHandler}
         >
-            <svg width={width} height={height} onClick={clickHandler} id="svg-canvas">
+            <svg width={width} height={height} id="svg-canvas">
                 <Map
                     width={width}
                     height={height}
                     data={data}
-                    toolBarOption={toolBarMode}
+                    toolBarOption={toolbarOption}
                     scrollPosition={scrollPosition}
                     zoomPosition={zoomPosition}
                     ref={mapSVG}
@@ -208,13 +275,12 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
 
                 {textElements.map(t => (
                     <TextElement
+                        key={t.id}
                         id={t.id}
                         position={t.position}
                         text={t.text}
                         onTextFinished={onTextFinished}
-
                     />
-
                 ))}
                 {initTextElement && (
                     <TextElement
@@ -225,10 +291,7 @@ export default function Canvas({ width, height, toolBarMode }: IProps) {
                         initText={(text) => { text !== "" ? insertTextElementHandler(text) : setInitTextElement(null) }}
                     />
                 )}
-
             </svg>
-
         </div>
     )
-
 }

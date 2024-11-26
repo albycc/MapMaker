@@ -6,6 +6,7 @@ export interface IText {
     colour: string;
     size: number;
     font: string;
+    style: string;
     position: Position;
 }
 

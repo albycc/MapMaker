@@ -11,6 +11,7 @@ import { Position } from "../types/Position";
 import { ToolbarContext } from "../../contexts/toolbarContexts";
 import { COLOURS } from "../../constants/colours";
 import { Img } from "../types/Image";
+import { selectionIsCountry } from "../../utils/typeChecks";
 
 // import data from "../data/custom.geo.json"
 
@@ -30,7 +31,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
     const [countries, setCountries] = useState<FeatureCollection>(data)
 
-    const { currentColour, selectedCountry, setSelectedCountry, images } = useContext(ToolbarContext)
+    const { currentColour, selected, setSelectedCountry, images } = useContext(ToolbarContext)
     const { countryList, editCountry, removeCountryColour } = useContext(BoardContext)
 
     // add a projection so d3 will convert what type of map we shall see
@@ -39,6 +40,17 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
     const projection = d3.geoEquirectangular().center([0, 0]).scale(zoomPosition).translate([scrollPosition.x, scrollPosition.y])
 
     const graticule = d3.geoGraticule10();
+
+    useEffect(() => {
+
+        d3.select("[stroke=red]").attr("stroke", COLOURS.countryBorderColour).attr("strokeWidth", 0.4)
+        if (selectionIsCountry(selected)) {
+            d3.select(`#p-${selected.id}`).attr("stroke", "red").attr("strokeWidth", 2)
+        } else if (selected == null) {
+        }
+
+
+    }, [selected])
 
     useEffect(() => {
 
@@ -80,7 +92,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
     const countryOnClickHandler = (event: React.MouseEvent) => {
 
-        const id = event.currentTarget.getAttribute("data-id")
+        const id = event.currentTarget.getAttribute("data-countryid")
         const name = event.currentTarget.getAttribute("data-name")
         if (id && name) {
             if (toolBarOption === ToolbarOption.Select) {
@@ -106,9 +118,9 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
     const removeCountryColourHandler = (event: React.MouseEvent<SVGPathElement>) => {
 
 
-        console.log("remove ", event.currentTarget.getAttribute("data-id"))
+        console.log("remove ", event.currentTarget.getAttribute("data-countryid"))
 
-        const id = event.currentTarget.getAttribute("data-id")
+        const id = event.currentTarget.getAttribute("data-countryid")
 
         if (id) {
             removeCountryColour(id)
@@ -129,13 +141,13 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
                     const centerPoint = path.centroid(c)
                     return <g key={c.id} id={"g-" + c.id}>
                         <path
-                            data-id={c.id}
+                            data-countryid={c.id}
                             id={"p-" + c.id}
                             data-name={c.properties!.name}
                             d={path(c)?.toString()}
-                            stroke={selectedCountry && selectedCountry.id === c.id ? "#ff0000" : "#7f7f7f"}
+                            stroke={COLOURS.countryBorderColour}
                             fill={COLOURS.defaultCountryColour}
-                            strokeWidth={(selectedCountry && selectedCountry.id === c.id) || (c.id === mouseOverCountry) ? 2 : 0.4}
+                            strokeWidth={mouseOverCountry === c.id ? 2 : 0.4}
                             cursor={"Pointer"}
                             onClick={countryOnClickHandler}
                             onContextMenu={removeCountryColourHandler}

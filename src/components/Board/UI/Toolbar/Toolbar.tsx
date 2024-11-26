@@ -13,6 +13,7 @@ import legendIcon from "../../../../icons/toolbar/legend.png"
 import ToolbarOptionsWindow from "./ToolbarOptionsWindows/ToolbarOptionsWindow"
 import ToolbarOptionsBrush from "./ToolbarOptionsWindows/ToolbarOptionsBrush"
 import { ToolbarContext } from "../../../../contexts/toolbarContexts"
+import ToolbarOptionsText from "./ToolbarOptionsWindows/ToolbarOptionsText"
 
 const buttons = [
     {
@@ -34,24 +35,17 @@ const buttons = [
 
 ]
 
-interface IProps {
-    onToolbarSelected: (option: ToolbarOption) => void
-}
-
-export default function Toolbar({ onToolbarSelected }: IProps) {
-    const [selectedToolbar, setSelectedToolbar] = useState<ToolbarOption>(ToolbarOption.Select)
-    const { setSelectedCountry } = useContext(ToolbarContext)
+export default function Toolbar() {
+    const { setSelectedCountry, toolbarOption, setToolbarOption } = useContext(ToolbarContext)
     const [showLegend, setShowLegend] = useState<boolean>(false);
 
     useEffect(() => {
 
-        onToolbarSelected(selectedToolbar)
-
-        if (selectedToolbar !== ToolbarOption.Select) {
+        if (toolbarOption !== ToolbarOption.Select) {
             setSelectedCountry(null)
         }
 
-    }, [selectedToolbar])
+    }, [toolbarOption])
 
     const menuItemClickedHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
 
@@ -60,7 +54,7 @@ export default function Toolbar({ onToolbarSelected }: IProps) {
         const label: ToolbarOption = target.value
 
 
-        setSelectedToolbar(Object.keys(ToolbarOption)[Object.values(ToolbarOption).indexOf(label)] as ToolbarOption)
+        setToolbarOption(Object.keys(ToolbarOption)[Object.values(ToolbarOption).indexOf(label)] as ToolbarOption)
 
     }
 
@@ -72,7 +66,7 @@ export default function Toolbar({ onToolbarSelected }: IProps) {
                         <button
                             key={b.label}
                             value={b.label}
-                            className={selectedToolbar === b.label ? styles.active : ""}
+                            className={toolbarOption === b.label ? styles.active : ""}
                             onClick={menuItemClickedHandler}>
                             {b.file ? <Icon file={b.file} size={25} /> : null}
                         </button>
@@ -80,7 +74,8 @@ export default function Toolbar({ onToolbarSelected }: IProps) {
 
                 </div>
             </WindowCard>
-            {selectedToolbar === ToolbarOption.Paint ? <ToolbarOptionsBrush /> : null}
+            {toolbarOption === ToolbarOption.Paint ? <ToolbarOptionsBrush /> : null}
+            {toolbarOption === ToolbarOption.Text ? <ToolbarOptionsText /> : null}
 
         </div>
     )

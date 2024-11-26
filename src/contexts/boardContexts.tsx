@@ -92,7 +92,6 @@ export default function BoardContextProvider({ children }: IProps) {
             setCountryList([...countryList.filter(c => c.id !== countryExists.id)])
         }
 
-        console.log(countryList)
 
     }
 

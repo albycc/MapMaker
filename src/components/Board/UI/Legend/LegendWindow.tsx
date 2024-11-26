@@ -10,7 +10,6 @@ import { Position } from "../../../types/Position";
 import { ToolbarContext } from "../../../../contexts/toolbarContexts";
 
 interface IProps {
-    toolbarOption: ToolbarOption,
     initialPosition: Position
 }
 
@@ -27,10 +26,10 @@ const legendStyles: ILegendStyles = {
     spaceBetweenRows: 5
 }
 
-export default function LegendWindow({ toolbarOption, initialPosition }: IProps) {
+export default function LegendWindow({ initialPosition }: IProps) {
 
 
-    const { setCurrentColour, currentColour } = useContext(ToolbarContext)
+    const { setCurrentColour, currentColour, toolbarOption } = useContext(ToolbarContext)
     const [newColour, setNewColour] = useState<string>("")
     const [legendTitle, setLegendTitle] = useState<string>("")
 
@@ -103,7 +102,7 @@ export default function LegendWindow({ toolbarOption, initialPosition }: IProps)
         const y = event.pageY
 
         if (moveMode) {
-            setPosition({ x: x, y: y })
+            setPosition({ x, y })
         }
     }
 

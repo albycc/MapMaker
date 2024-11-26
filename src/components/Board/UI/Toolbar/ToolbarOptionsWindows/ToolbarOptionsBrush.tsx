@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { BoardContext } from "../../../../../contexts/boardContexts"
 import { Img } from "../../../../types/Image"
 import { ToolbarContext } from "../../../../../contexts/toolbarContexts"
+import ToolbarOptionsWindow from "./ToolbarOptionsWindow"
 
 
 export default function ToolbarOptionsBrush() {
@@ -10,9 +11,6 @@ export default function ToolbarOptionsBrush() {
     const { setCurrentColour, currentColour, images, addImage } = useContext(ToolbarContext)
     const [inputHexColour, setInputHexColour] = useState<string>("")
     const [currentImage, setCurrentImage] = useState<Img | null>(null)
-
-    console.log("inputHexColour: ", inputHexColour)
-
 
     useEffect(() => {
 
@@ -35,7 +33,6 @@ export default function ToolbarOptionsBrush() {
         }
 
     }, [usesBrush])
-
 
     const imageSelectorHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -60,8 +57,6 @@ export default function ToolbarOptionsBrush() {
             }
 
             fileReader.readAsDataURL(file[0])
-
-            console.log(file)
         }
     }
 
@@ -75,67 +70,65 @@ export default function ToolbarOptionsBrush() {
             if (img) {
                 setCurrentImage(img)
                 setCurrentColour(img)
-
             }
-
         }
-
-
     }
+
     return (
-        <div className="absolute flex flex-col bg-orange-100 rounded-bl-md rounded-br-md p-2" style={{ top: 36, left: 0 }}>
-            <div className="flex my-1">
-                <span className="w-24">
-                    <input type="radio" name="brush-fill" id="use-color" defaultChecked onChange={() => setUsesBrush(true)} />
-                    <label htmlFor="use-color" className="ml-1">Colour</label>
-                </span>
-                <span className="w-24">
-                    <input type="radio" name="brush-fill" id="use-image" onChange={() => setUsesBrush(false)} />
-                    <label htmlFor="use-image" className="ml-1">Image</label>
-                </span>
-            </div>
-            <div className="flex my-1">
-                {usesBrush ? (
-                    <>
-                        <input
-                            className="w-6"
-                            type="color"
-                            name=""
-                            id=""
-                            value={inputHexColour}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputHexColour(event.target.value)}
-                            onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                console.log(event.target.value)
-                                setCurrentColour(event.target.value)
-                            }} />
-
-                    </>
-                ) : (
-                    <div>
-                        <div className="flex flex-wrap items-start overflow-y-auto h-20">
-                            {images.map((image) => {
-                                return (
-                                    <button className={currentImage && currentImage.label === image.label ? "border border-b-slate-900" : "m-1"} key={image.label} onClick={onClickImageHandler} data-key={image.label}>
-                                        <img className="w-8 h-8" src={image.src} alt={image.label} />
-                                    </button>
-                                )
-                            })}
-                            <label htmlFor="select-image" className="bg-slate-100 px-3 py-1 h-10 cursor-pointer border rounded-lg text-lg">
-                                <input
-                                    className="hidden"
-                                    type="file"
-                                    name=""
-                                    id="select-image"
-                                    accept=".jpeg, .jpg, .png"
-                                    onChange={imageSelectorHandler}
-                                />
-                                +
-                            </label>
+        <ToolbarOptionsWindow>
+            <div className="flex flex-col">
+                <div className="flex my-1">
+                    <span className="w-24">
+                        <input type="radio" name="brush-fill" id="use-color" defaultChecked onChange={() => setUsesBrush(true)} />
+                        <label htmlFor="use-color" className="ml-1">Colour</label>
+                    </span>
+                    <span className="w-24">
+                        <input type="radio" name="brush-fill" id="use-image" onChange={() => setUsesBrush(false)} />
+                        <label htmlFor="use-image" className="ml-1">Image</label>
+                    </span>
+                </div>
+                <div className="flex my-1">
+                    {usesBrush ? (
+                        <>
+                            <input
+                                className="w-6"
+                                type="color"
+                                name=""
+                                id=""
+                                value={inputHexColour}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputHexColour(event.target.value)}
+                                onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                    console.log(event.target.value)
+                                    setCurrentColour(event.target.value)
+                                }} />
+                        </>
+                    ) : (
+                        <div>
+                            <div className="flex flex-wrap items-start overflow-y-auto h-20">
+                                {images.map((image) => {
+                                    return (
+                                        <button className={currentImage && currentImage.label === image.label ? "border border-b-slate-900" : "m-1"} key={image.label} onClick={onClickImageHandler} data-key={image.label}>
+                                            <img className="w-8 h-8" src={image.src} alt={image.label} />
+                                        </button>
+                                    )
+                                })}
+                                <label htmlFor="select-image" className="bg-slate-100 px-3 py-1 h-10 cursor-pointer border rounded-lg text-lg">
+                                    <input
+                                        className="hidden"
+                                        type="file"
+                                        name=""
+                                        id="select-image"
+                                        accept=".jpeg, .jpg, .png"
+                                        onChange={imageSelectorHandler}
+                                    />
+                                    +
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
             </div>
-        </div>
+        </ToolbarOptionsWindow>
     )
 }

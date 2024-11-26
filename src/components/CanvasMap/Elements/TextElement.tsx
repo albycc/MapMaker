@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Position } from "../../types/Position";
 import { IText } from "./element-types";
+import { ToolbarContext } from "../../../contexts/toolbarContexts";
+import { ToolbarOption } from "../../Board/UI/Toolbar/Toolbar-types";
+import { selectionIsText } from "../../../utils/typeChecks";
 
 interface IProps {
     id: string;
@@ -13,6 +16,8 @@ interface IProps {
 export default function TextElement(props: IProps) {
 
     const [editing, setEditing] = useState<boolean>(true)
+    const { toolbarOption, selected } = useContext(ToolbarContext)
+
 
     const handleText = (newText: string) => {
         if (props.initText && newText === "") {
@@ -26,6 +31,15 @@ export default function TextElement(props: IProps) {
         setEditing(false)
 
     }
+
+    const textClickHandler = (event: React.MouseEvent<SVGTextElement>) => {
+
+        if (toolbarOption === ToolbarOption.Text) {
+            setEditing(true)
+
+        }
+    }
+
 
     return (
         <>
@@ -44,22 +58,24 @@ export default function TextElement(props: IProps) {
                                     if (event.key === "Enter") handleText(event.currentTarget.value)
                                 }}
                                 autoFocus />
-
                         </div>
-
                     </foreignObject>
                 )
-
                 : (
-                    <text
-                        id={props.id}
-                        x={props.position.x}
-                        y={props.position.y}
-                        onClick={() => setEditing(true)}
+                    <g >
+                        <text
+                            id={props.id}
+                            x={props.position.x}
+                            y={props.position.y}
+                            onClick={textClickHandler}
+                            className="cursor-pointer select-none"
+                        >
+                            {props.text}
+                        </text>
+                        {selected?.id === props.id ? <rect x={props.position.x} y={props.position.y - 15} width="100" height="20" stroke="blue" fill="none"></rect> : null}
 
-                    >
-                        {props.text}
-                    </text>)}
+                    </g>
+                )}
             )
         </>
     )
