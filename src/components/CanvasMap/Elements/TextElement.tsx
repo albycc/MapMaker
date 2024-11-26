@@ -9,15 +9,19 @@ interface IProps {
     id: string;
     text: string;
     position: Position;
+    font?: string;
+    size?: number;
+    colour?: string;
+    style?: string;
     onTextFinished: (id: string, text: string) => void
-    initText?: (text: string) => void
+    initText?: (text: string) => void;
+    isMoving?: boolean
 }
 
 export default function TextElement(props: IProps) {
 
     const [editing, setEditing] = useState<boolean>(true)
     const { toolbarOption, selected } = useContext(ToolbarContext)
-
 
     const handleText = (newText: string) => {
         if (props.initText && newText === "") {
@@ -27,8 +31,8 @@ export default function TextElement(props: IProps) {
             props.initText(newText)
         }
 
-        props.onTextFinished(props.id, newText)
         setEditing(false)
+        props.onTextFinished(props.id, newText)
 
     }
 
@@ -40,24 +44,26 @@ export default function TextElement(props: IProps) {
         }
     }
 
-
     return (
         <>
             {editing ?
                 (
-                    <foreignObject x={props.position.x} y={props.position.y} width="110" height="30">
+                    <foreignObject x={props.position.x} y={props.position.y - 15} width="110" height="100">
                         <div className="bg-orange-400 flex">
                             <input
-                                className="w-full px-2"
+                                className="w-full px-2 border-none"
+                                style={{ fontSize: props.size }}
                                 type="text"
                                 name=""
                                 id=""
                                 defaultValue={props.text}
                                 onBlur={(event: React.ChangeEvent<HTMLInputElement>) => handleText(event.currentTarget.value)}
                                 onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                                    console.log(event.key)
                                     if (event.key === "Enter") handleText(event.currentTarget.value)
                                 }}
-                                autoFocus />
+                                autoFocus
+                            />
                         </div>
                     </foreignObject>
                 )
@@ -68,11 +74,21 @@ export default function TextElement(props: IProps) {
                             x={props.position.x}
                             y={props.position.y}
                             onClick={textClickHandler}
-                            className="cursor-pointer select-none"
+                            className={toolbarOption === ToolbarOption.Text ? "cursor-text" : "cursor-pointer"}
+                            fontSize={props.size + "px"}
+                            style={{ fontFamily: props.font, fontWeight: props.style === "bold" ? "bold" : "normal", fontStyle: props.style }}
                         >
                             {props.text}
                         </text>
-                        {selected?.id === props.id ? <rect x={props.position.x} y={props.position.y - 15} width="100" height="20" stroke="blue" fill="none"></rect> : null}
+                        {selected?.id === props.id && !props.isMoving ? (
+                            <rect
+                                x={props.position.x}
+                                y={props.position.y - 15}
+                                width="100"
+                                height="20"
+                                stroke="blue"
+                                fill="none"
+                            ></rect>) : null}
 
                     </g>
                 )}

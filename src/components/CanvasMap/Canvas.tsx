@@ -22,11 +22,11 @@ const scrollSpeed = 25
 
 export default function Canvas({ width, height }: IProps) {
 
-    const { setSelectedCountry, toolbarOption, setSelectedText, selected } = useContext(ToolbarContext)
+    const { setSelectedCountry, toolbarOption, setSelectedText, selected, toolbarTextOptions } = useContext(ToolbarContext)
     const [textElements, setTextElements] = useState<IText[]>([])
 
-    const [initTextElement, setInitTextElement] = useState<IText | null>(null) //checks when user clicks on canvas with create text tool
-    const [sprites, setSprites] = useState<ISprite[]>([])
+    const [initTextFirstTime, setInitTextFirstTime] = useState<boolean>(false) //checks when user clicks on canvas with create text tool
+    const [textEdit, setTextEdit] = useState<IText | null>(null)
 
     const [scrollPosition, setScrollPosition] = useState<Position>({ x: width / 2, y: height / 2 })
     const [scrollMouseDistance, setScrollMouseDistance] = useState<Position>({ x: 0, y: 0 })
@@ -49,44 +49,18 @@ export default function Canvas({ width, height }: IProps) {
 
     }, [])
 
-    // useEffect(() => {
-
-    //     console.log(selected)
-
-    //     if (selectionIsText(selected)) {
-    //         d3.select(`#${selected.id}`).append("rect").attr()
-    //     }
-
-    // }, [selected])
-
-    // x axis
-
-
-    // useEffect(() => {
-    //     console.log("draw grid")
-    //     var x = d3.scaleLinear().range([0, width]).domain([0, 100000]);
-    //     // d3.select("#gridlines")
-    //     //     .append("g")
-    //     //     .call(d3.axisBottom(x).ticks(10).tickSizeInner(-height))
-
-
-    // }, [])
-
     const clickHandler = (event: React.MouseEvent<HTMLDivElement>) => {
 
         const target = event.target
 
         if (toolbarOption === ToolbarOption.Select) {
 
+            // done moving element
             if (selectionIsText(selected) && moveElement instanceof SVGTextElement) {
 
                 const index = textElements.findIndex(t => t.id === selected.id)
 
-                console.log("index: ", index)
-
-
                 if (index !== -1) {
-                    console.log("drop it")
 
                     const rect = moveElement.getBoundingClientRect()
 
@@ -97,11 +71,8 @@ export default function Canvas({ width, height }: IProps) {
                     setMoveElement(null)
                 }
 
-            }
-
-            else if (target instanceof SVGPathElement && target.getAttribute("data-countryid")) {
+            } else if (target instanceof SVGPathElement && target.getAttribute("data-countryid")) {
                 const countryId = target.getAttribute("data-countryid")
-                console.log("countryid: ", target.getAttribute("data-countryid"))
                 if (countryId !== null) {
                     setSelectedCountry(countryId)
                 } else {
@@ -111,69 +82,45 @@ export default function Canvas({ width, height }: IProps) {
                 const text = textElements.find(t => t.id === target.id)
 
                 if (selectionIsText(selected) && target.id === selected.id) {
-                    console.log("time to move")
                     setMoveElement(target)
                 } else if (text !== undefined) {
-                    console.log("text selected ", text)
                     setSelectedText(text)
                 }
+            } else {
+                setSelectedText(null)
             }
 
         } else if (toolbarOption === ToolbarOption.Text) {
 
             if (target instanceof SVGTextElement) {
-                const id = target.id
 
+                const textElement = textElements.find(t => t.id === target.id)
+
+                if (textElement !== undefined) {
+
+                    setSelectedText(textElement)
+
+                    return
+
+                }
             }
-
 
             const text: IText = {
                 id: "t-" + Math.random().toString().slice(2),
                 text: "",
-                colour: "black",
-                size: 10,
-                font: "Arial",
-                style: "normal",
+                colour: toolbarTextOptions.colour,
+                size: toolbarTextOptions.size,
+                font: toolbarTextOptions.font,
+                style: toolbarTextOptions.style,
                 position: {
                     x: event.clientX,
                     y: event.clientY
                 }
             }
-            setInitTextElement(text)
-            // setTextElements([...textElements, text])
+            setInitTextFirstTime(true)
+            setTextEdit(text)
 
-
-        } else if (toolbarOption === ToolbarOption.Sprite) {
-
-            const w = 75
-            const h = 75
-
-            const sprite: ISprite = {
-                id: "s-" + Math.random().toString().slice(2),
-                src: "sprite.png",
-                position: {
-                    x: event.clientX - (w / 2),
-                    y: event.clientY - (h / 2)
-                },
-                width: w,
-                height: h
-            }
-
-            setSprites([...sprites, sprite])
         }
-        // else if (toolBarMode === ToolbarOption.Legend) {
-        //     const element = document.getElementById("board")
-
-        //     console.log(element)
-
-        //     if (element) {
-        //         createPortal(<LegendWindow toolbarOption={toolBarMode} />, element)
-        //     }
-
-
-        // }
-
-
     }
 
     const onTextFinished = (id: string, text: string) => {
@@ -192,10 +139,11 @@ export default function Canvas({ width, height }: IProps) {
 
     const insertTextElementHandler = (text: string) => {
 
-        if (initTextElement !== null) {
-            initTextElement.text = text
-            setTextElements([...textElements, initTextElement])
-            setInitTextElement(null)
+        if (textEdit !== null && initTextFirstTime) {
+            textEdit.text = text
+            setTextElements([...textElements, textEdit])
+            setTextEdit(null)
+            setInitTextFirstTime(false)
         }
     }
 
@@ -252,6 +200,9 @@ export default function Canvas({ width, height }: IProps) {
         }
     }
 
+    console.log("render canvas")
+    console.log("selected ", selected)
+
     return (
         <div
             className={styles["canvas-container"] + toolbarOption === ToolbarOption.Paint ? styles["paint-cursor"] : ""}
@@ -271,7 +222,6 @@ export default function Canvas({ width, height }: IProps) {
                     zoomPosition={zoomPosition}
                     ref={mapSVG}
                 />
-                {sprites.map(s => <SpriteElement src={s.src} position={s.position} width={s.width} height={s.height} />)}
 
                 {textElements.map(t => (
                     <TextElement
@@ -279,16 +229,23 @@ export default function Canvas({ width, height }: IProps) {
                         id={t.id}
                         position={t.position}
                         text={t.text}
+                        size={t.size}
+                        colour={t.colour}
+                        font={t.font}
                         onTextFinished={onTextFinished}
+                        isMoving={moveElement !== null && t.id === moveElement.id}
                     />
                 ))}
-                {initTextElement && (
+                {initTextFirstTime && textEdit && (
                     <TextElement
-                        id={initTextElement.id}
-                        position={initTextElement.position}
-                        text={initTextElement.text}
+                        id={textEdit.id}
+                        position={textEdit.position}
+                        text={textEdit.text}
+                        size={textEdit.size}
+                        colour={textEdit.colour}
+                        font={textEdit.font}
                         onTextFinished={onTextFinished}
-                        initText={(text) => { text !== "" ? insertTextElementHandler(text) : setInitTextElement(null) }}
+                        initText={(text) => { insertTextElementHandler(text) }}
                     />
                 )}
             </svg>
