@@ -1,59 +1,26 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import WindowCard from "../globals/WindowCard";
-import { ILegend, ILegendStyles } from "./LegendTypes";
-import { LegendContext } from "../../../../contexts/legendContexts";
+import { useContext, useEffect, useState } from "react";
+import { ILegend } from "../../../../types/LegendTypes";
 import { ToolbarOption } from "../Toolbar/Toolbar-types";
-import { BoardContext } from "../../../../contexts/boardContexts";
-import deleteIcon from "../../../../icons/delete_icon.png"
-import LegendWindowStyles from "./LegendWindowStyles";
-import { Position } from "../../../types/Position";
 import { ToolbarContext } from "../../../../contexts/toolbarContexts";
 import * as d3 from "d3"
 
-interface IProps {
-    initialPosition: Position
-}
 
-const legendStyles: ILegendStyles = {
-    border: true,
-    borderColor: "#828282",
-    borderWidth: 2,
-    borderRound: 10,
-    background: true,
-    backgroundColor: "#ffffff",
-    fontColor: "#4f4f4f",
-    titleSize: 20,
-    framePadding: 10,
-    spaceBetweenRows: 5
-}
-
-export default function LegendWindow({ initialPosition }: IProps) {
+export default function LegendWindow() {
 
     const [legend, setLegend] = useState<ILegend[]>([])
 
-    const { currentColour, setCurrentColour, toolbarOption } = useContext(ToolbarContext)
+    const { currentColour, setCurrentColour, toolbarOption, toolbarLegendStyles } = useContext(ToolbarContext)
     const [newColour, setNewColour] = useState<string>("")
     const [legendTitle, setLegendTitle] = useState<string>("Legend title")
     const [legendTitleEditMode, setLegendTitleEditMode] = useState<boolean>(false)
 
     const [legendRowEdit, setLegendRowEdit] = useState<ILegend | null>(null)
 
-
-    const isPaintMode = toolbarOption === ToolbarOption.Paint
-
-    const [position, setPosition] = useState<Position>({ x: 10, y: 500 })
-    const [positionOffset, setPositionOffset] = useState<Position>({ x: 0, y: 0 })
-
-    const [moveMode, setMoveMode] = useState<boolean>(false);
-
-    const [legendStyle, setLegendStyle] = useState<ILegendStyles>(legendStyles)
-
     useEffect(() => {
         const mouseTrack = (event: MouseEvent) => {
 
             d3.select("#legend").attr("x", event.clientX).attr("y", event.clientY)
 
-            // setPosition({ x: event.clientX, y: event.clientY })
 
             document.removeEventListener("click", mouseTrack)
 
@@ -96,42 +63,6 @@ export default function LegendWindow({ initialPosition }: IProps) {
     //     }
     // }
 
-    console.log("render Legend window", moveMode)
-
-    const onLegendWindowClick = (event: React.MouseEvent<SVGRectElement>) => {
-        const element = event.target as SVGRectElement
-
-        const rect = element.getBoundingClientRect()
-
-        const offsetX = event.clientX - rect.left;
-        const offsetY = event.clientY - rect.top;
-
-        if (element.id === "legend") {
-            setMoveMode(!moveMode)
-            setPositionOffset({ x: offsetX, y: offsetY })
-            setPosition({ x: event.pageX, y: event.pageY })
-
-        }
-
-    }
-
-    const onMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-
-        const x = event.pageX
-        const y = event.pageY
-
-        if (moveMode) {
-            setPosition({ x, y })
-        }
-    }
-
-    const onLegendStylesChange = (form: ILegendStyles) => {
-
-        console.log(form)
-
-        setLegendStyle(form)
-    }
-
     const legendRowInputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 
         if (legendRowEdit) {
@@ -161,9 +92,11 @@ export default function LegendWindow({ initialPosition }: IProps) {
                 id="legend-frame"
                 width={300}
                 height={150 + legend.length * 50}
-                fill="white"
-                rx={15}
-                style={{ stroke: "black", strokeWidth: 1 }}
+                fill={toolbarLegendStyles.backgroundColor}
+                rx={toolbarLegendStyles.borderRound}
+                style={{
+                    stroke: toolbarLegendStyles.borderColor, strokeWidth: toolbarLegendStyles.borderWidth
+                }}
                 className={toolbarOption === ToolbarOption.Select ? "cursor-move" : ""}
             />
             {legendTitleEditMode ? (
@@ -181,12 +114,13 @@ export default function LegendWindow({ initialPosition }: IProps) {
                 </foreignObject>
             ) : (
                 <text
-                    x={100}
+                    x={20}
                     y={40}
-                    fontSize={22}
+                    fontSize={toolbarLegendStyles.titleSize}
                     onClick={() => setLegendTitleEditMode(true)}
                     width="300"
                     height="100"
+                    fill={toolbarLegendStyles.fontColor}
                 >
                     {legendTitle}
                 </text>
@@ -194,7 +128,7 @@ export default function LegendWindow({ initialPosition }: IProps) {
             )}
             <g>
                 {legend.map((l, i) => (
-                    <g key={l.id} transform={`translate(${20} ${(i + 1) * 40 + 20})`}>
+                    <g key={l.id} transform={`translate(${20} ${(i + 1) * toolbarLegendStyles.spaceBetweenRows + 20})`}>
                         <rect fill={l.colour} width={20} height={20}></rect>
                         {
                             legendRowEdit?.id === l.id ? (
@@ -221,6 +155,7 @@ export default function LegendWindow({ initialPosition }: IProps) {
                                             setLegendRowEdit(l)
                                     }}
                                     className={toolbarOption === ToolbarOption.Paint ? "cursor-pointer" : "cursor-text"}
+                                    fill={toolbarLegendStyles.fontColor}
                                 >
                                     {l.label}
                                 </text>

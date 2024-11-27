@@ -9,6 +9,7 @@ import { IText } from "../components/CanvasMap/Elements/element-types";
 import { ToolbarOption } from "../components/Board/UI/Toolbar/Toolbar-types";
 import { IToolbarOptionsText } from "../components/Board/UI/Toolbar/ToolbarOptionsWindows/ToolbarOptionsText";
 import { selectionIsText } from "../utils/typeChecks";
+import { ILegendStyles } from "../types/LegendTypes";
 
 type IToolbarContextType = {
     toolbarOption: ToolbarOption,
@@ -21,7 +22,9 @@ type IToolbarContextType = {
     setSelectedCountry: (countryId: string | null) => void;
     setSelectedText: (text: IText | null) => void;
     toolbarTextOptions: IToolbarOptionsText;
-    setToolbarTextOptions: (toolbarOptionText: IToolbarOptionsText) => void
+    setToolbarTextOptions: (toolbarOptionText: IToolbarOptionsText) => void;
+    toolbarLegendStyles: ILegendStyles;
+    setToolbarLegendStyles: (styles: ILegendStyles) => void
 }
 
 
@@ -41,7 +44,17 @@ export const ToolbarContext = createContext<IToolbarContextType>({
         size: 10,
         colour: "#000000"
     },
-    setToolbarTextOptions: (toolbarOptionText: IToolbarOptionsText) => { }
+    setToolbarTextOptions: (toolbarOptionText: IToolbarOptionsText) => { },
+    toolbarLegendStyles: {
+        borderColor: "#828282",
+        borderWidth: 2,
+        borderRound: 10,
+        backgroundColor: "#ffffff",
+        fontColor: "#4f4f4f",
+        titleSize: 20,
+        spaceBetweenRows: 40
+    },
+    setToolbarLegendStyles: (styles: ILegendStyles) => { }
 })
 
 type IProps = {
@@ -60,6 +73,16 @@ export default function ToolbarContextProvider({ children }: IProps) {
         size: 10,
         colour: "#000000"
     })
+    const [toolbarLegendStyles, setToolbarLegendStyles] = useState<ILegendStyles>({
+        borderColor: "#828282",
+        borderWidth: 2,
+        borderRound: 10,
+        backgroundColor: "#ffffff",
+        fontColor: "#4f4f4f",
+        titleSize: 20,
+        spaceBetweenRows: 40
+    })
+
     const { countryList } = useContext(BoardContext)
 
     const addImage = (img: Img) => setImages([...images, img])
@@ -107,6 +130,11 @@ export default function ToolbarContextProvider({ children }: IProps) {
         setToolbarTextOptions(options)
     }
 
+    const setToolbarLegendStylesHandler = (styles: ILegendStyles) => {
+        setToolbarLegendStyles(styles)
+
+    }
+
     return (
         <ToolbarContext.Provider value={{
             toolbarOption,
@@ -119,7 +147,9 @@ export default function ToolbarContextProvider({ children }: IProps) {
             setSelectedCountry: setSelectedCountryHandler,
             setSelectedText: setSelectedTextHandler,
             toolbarTextOptions,
-            setToolbarTextOptions: setToolbarTextOptionsHandler
+            setToolbarTextOptions: setToolbarTextOptionsHandler,
+            toolbarLegendStyles,
+            setToolbarLegendStyles: setToolbarLegendStylesHandler
         }}>
             {children}
         </ToolbarContext.Provider>

@@ -268,7 +268,7 @@ export default function Canvas({ width, height }: IProps) {
                     zoomPosition={zoomPosition}
                     ref={mapSVG}
                 />
-                {legendIsActive ? <LegendWindow initialPosition={{ x: 300, y: 500 }} /> : null}
+                {legendIsActive ? <LegendWindow /> : null}
 
                 {textElements.map(t => (
                     <TextElement

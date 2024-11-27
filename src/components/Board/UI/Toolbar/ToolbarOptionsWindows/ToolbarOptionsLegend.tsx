@@ -1,15 +1,17 @@
-import React from "react";
-import WindowCard from "../globals/WindowCard"
-import { ILegendStyles } from "./LegendTypes"
+import { useContext } from "react";
+import { ILegendStyles } from "../../../../../types/LegendTypes";
+import ToolbarOptionsWindow from "./ToolbarOptionsWindow";
+import { ToolbarContext } from "../../../../../contexts/toolbarContexts";
 
-interface IProps {
-    values: ILegendStyles;
-    onChange: (form: ILegendStyles) => void;
-    close: () => void
-}
+// interface IProps {
+//     toolbarLegendStyles: ILegendStyles;
+//     onChange: (form: ILegendStyles) => void;
+//     close: () => void
+// }
 
-export default function LegendWindowStyles({ values, onChange, close }: IProps) {
+export default function ToolbarOptionsLegend() {
 
+    const { toolbarLegendStyles, setToolbarLegendStyles } = useContext(ToolbarContext)
 
     const formOnChange = (event: React.FormEvent<HTMLFormElement>) => {
 
@@ -28,32 +30,18 @@ export default function LegendWindowStyles({ values, onChange, close }: IProps) 
                 break;
             default:
                 value = input.value
-
-
-
         }
 
-        onChange({ ...values, [input.id]: value })
-
-        // const formData = new FormData(event.target)
-
-        // for (let [ley, value] of formData.entries()) {
-
-        // }
-
-        // console.log(formData.entries())
-
-
-
+        setToolbarLegendStyles({ ...toolbarLegendStyles, [input.id]: value })
     }
+
     return (
-        <WindowCard position={{ top: 10, left: 230 }}>
+        <ToolbarOptionsWindow>
             <form onChange={formOnChange}>
                 <div className="flex">
                     <ul>
-
                         <li className="flex">
-                            <input type="color" name="borderColor" id="borderColor" value={values.borderColor} />
+                            <input type="color" name="borderColor" id="borderColor" value={toolbarLegendStyles.borderColor} />
                             <label htmlFor="borderColour" >Border colour</label>
                         </li>
                         <li className="flex">
@@ -62,7 +50,7 @@ export default function LegendWindowStyles({ values, onChange, close }: IProps) 
                                 className="w-16 h-6"
                                 name="borderWidth"
                                 id="borderWidth"
-                                value={values.borderWidth}
+                                value={toolbarLegendStyles.borderWidth}
                                 min={0}
                             />
                             <label htmlFor="borderWidth">Border width</label>
@@ -73,46 +61,34 @@ export default function LegendWindowStyles({ values, onChange, close }: IProps) 
                                 className="w-16 h-6"
                                 name="borderRound"
                                 id="borderRound"
-                                value={values.borderRound}
+                                value={toolbarLegendStyles.borderRound}
                                 min={0}
                             />
                             <label htmlFor="borderWidth">Border round</label>
                         </li>
                     </ul>
                     <ul>
-
                         <li className="flex">
-                            <input type="color" name="backgroundColor" id="backgroundColor" value={values.backgroundColor} />
+                            <input type="color" name="backgroundColor" id="backgroundColor" value={toolbarLegendStyles.backgroundColor} />
                             <label htmlFor="backgroundColor" >Background colour</label>
                         </li>
                     </ul>
                     <ul>
                         <li className="flex">
-                            <input type="color" name="fontColor" id="fontColor" value={values.fontColor} />
+                            <input type="color" name="fontColor" id="fontColor" value={toolbarLegendStyles.fontColor} />
                             <label htmlFor="fontColorr" >Font colour</label>
                         </li>
                         <li className="flex">
-                            <input type="number" className="w-16 h-6" name="titleSize" id="titleSize" value={values.titleSize} />
+                            <input type="number" className="w-16 h-6" name="titleSize" id="titleSize" value={toolbarLegendStyles.titleSize} />
                             <label htmlFor="frameMargin" >Title size</label>
                         </li>
                         <li className="flex">
-                            <input type="number" className="w-16 h-6" name="framePadding" id="framePadding" value={values.framePadding} />
-                            <label htmlFor="frameMaframePaddingrgin" >Frame padding</label>
-                        </li>
-                        <li className="flex">
-                            <input type="number" className="w-16 h-6" name="spaceBetweenRows" id="spaceBetweenRows" value={values.spaceBetweenRows} />
+                            <input type="number" className="w-16 h-6" name="spaceBetweenRows" id="spaceBetweenRows" value={toolbarLegendStyles.spaceBetweenRows} />
                             <label htmlFor="spaceBetweenRows" >Space between rows</label>
                         </li>
                     </ul>
-
-
                 </div>
             </form>
-            <div>
-                <button onClick={() => close()}>Close</button>
-            </div>
-
-
-        </WindowCard>
+        </ToolbarOptionsWindow>
     )
 }

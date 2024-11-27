@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useState } from "react";
-import { ILegend } from "../components/Board/UI/Legend/LegendTypes";
+import { ILegend } from "../types/LegendTypes";
 import { BoardContext } from "./boardContexts";
 import { ICountry } from "../types/CountriesTypes";
 

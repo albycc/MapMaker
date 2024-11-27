@@ -1,19 +1,16 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect } from "react"
 import styles from "./toolbar-styles.module.css"
 import { ToolbarOption } from "./Toolbar-types"
-import { BoardContext } from "../../../../contexts/boardContexts"
 import WindowCard from "../globals/WindowCard"
 import Icon from "../globals/Icon"
 import selectIcon from "../../../../icons/toolbar/select.png"
 import brushIcon from "../../../../icons/toolbar/brush.png"
-import spritesIcon from "../../../../icons/toolbar/sprites.png"
 import textIcon from "../../../../icons/toolbar/text.png"
-import imageIcon from "../../../../icons/toolbar/image.png"
 import legendIcon from "../../../../icons/toolbar/legend.png"
-import ToolbarOptionsWindow from "./ToolbarOptionsWindows/ToolbarOptionsWindow"
 import ToolbarOptionsBrush from "./ToolbarOptionsWindows/ToolbarOptionsBrush"
 import { ToolbarContext } from "../../../../contexts/toolbarContexts"
 import ToolbarOptionsText from "./ToolbarOptionsWindows/ToolbarOptionsText"
+import ToolbarOptionsLegend from "./ToolbarOptionsWindows/ToolbarOptionsLegend"
 
 const buttons = [
     {
@@ -37,7 +34,6 @@ const buttons = [
 
 export default function Toolbar() {
     const { setSelectedCountry, toolbarOption, setToolbarOption } = useContext(ToolbarContext)
-    const [showLegend, setShowLegend] = useState<boolean>(false);
 
     useEffect(() => {
 
@@ -76,6 +72,7 @@ export default function Toolbar() {
             </WindowCard>
             {toolbarOption === ToolbarOption.Paint ? <ToolbarOptionsBrush /> : null}
             {toolbarOption === ToolbarOption.Text ? <ToolbarOptionsText /> : null}
+            {toolbarOption === ToolbarOption.Legend ? <ToolbarOptionsLegend /> : null}
 
         </div>
     )

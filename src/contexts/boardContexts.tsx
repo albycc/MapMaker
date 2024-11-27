@@ -1,7 +1,7 @@
 import { createContext, useState } from "react";
 import { ICountry } from "../types/CountriesTypes";
 import { data } from "../data/data"
-import { ILegend } from "../components/Board/UI/Legend/LegendTypes";
+import { ILegend } from "../types/LegendTypes";
 
 type IBoardContextType = {
     editCountry: (country: ICountry) => void,
