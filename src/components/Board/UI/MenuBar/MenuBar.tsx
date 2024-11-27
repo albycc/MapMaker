@@ -1,8 +1,5 @@
 
 import { useState } from "react"
-import styles from "./menubar-styles.module.css"
-import MenuBarLegend from "./MeuBarItems/MenuBarLegend";
-import WindowCard from "../globals/WindowCard";
 import Icon from "../globals/Icon";
 
 import mapIcon from "../../../../icons/menubar/map.png"

@@ -23,7 +23,7 @@ type IToolbarContextType = {
     setSelectedText: (text: IText | null) => void;
     toolbarTextOptions: IToolbarOptionsText;
     setToolbarTextOptions: (toolbarOptionText: IToolbarOptionsText) => void;
-    toolbarLegendStyles: ILegendStyles;
+    toolbarLegendStyles: ILegendStyles | null;
     setToolbarLegendStyles: (styles: ILegendStyles) => void
 }
 
@@ -45,21 +45,23 @@ export const ToolbarContext = createContext<IToolbarContextType>({
         colour: "#000000"
     },
     setToolbarTextOptions: (toolbarOptionText: IToolbarOptionsText) => { },
-    toolbarLegendStyles: {
-        borderColor: "#828282",
-        borderWidth: 2,
-        borderRound: 10,
-        backgroundColor: "#ffffff",
-        fontColor: "#4f4f4f",
-        titleSize: 20,
-        spaceBetweenRows: 40
-    },
+    toolbarLegendStyles: null,
     setToolbarLegendStyles: (styles: ILegendStyles) => { }
 })
 
 type IProps = {
     children: JSX.Element
 }
+
+// {
+//     borderColor: "#828282",
+//     borderWidth: 2,
+//     borderRound: 10,
+//     backgroundColor: "#ffffff",
+//     fontColor: "#4f4f4f",
+//     titleSize: 20,
+//     spaceBetweenRows: 40
+// },
 
 export default function ToolbarContextProvider({ children }: IProps) {
     const [toolbarOption, setToolbarOption] = useState<ToolbarOption>(ToolbarOption.Select)
@@ -73,15 +75,7 @@ export default function ToolbarContextProvider({ children }: IProps) {
         size: 10,
         colour: "#000000"
     })
-    const [toolbarLegendStyles, setToolbarLegendStyles] = useState<ILegendStyles>({
-        borderColor: "#828282",
-        borderWidth: 2,
-        borderRound: 10,
-        backgroundColor: "#ffffff",
-        fontColor: "#4f4f4f",
-        titleSize: 20,
-        spaceBetweenRows: 40
-    })
+    const [toolbarLegendStyles, setToolbarLegendStyles] = useState<ILegendStyles | null>(null)
 
     const { countryList } = useContext(BoardContext)
 

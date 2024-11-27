@@ -29,21 +29,6 @@ export default function ToolbarOptionsText() {
 
     const { toolbarTextOptions, setToolbarTextOptions, selected } = useContext(ToolbarContext)
 
-    useEffect(() => {
-
-        console.log("ToolbarOptionsText: ", selected)
-
-        // if (selectionIsText(selected)) {
-        //     setToolbarTextOptions({
-        //         font: selected.font,
-        //         style: selected.style,
-        //         size: selected.size,
-        //         colour: selected.colour
-        //     })
-        // }
-
-    }, [selected])
-
     return (
         <ToolbarOptionsWindow>
             <div className="flex">
@@ -52,14 +37,14 @@ export default function ToolbarOptionsText() {
                     id="font"
                     onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setToolbarTextOptions({ ...toolbarTextOptions, font: event.target.value })}
                 >
-                    {fonts.map((f, i) => <option key={i} value={f} selected={toolbarTextOptions.font === f}>{f}</option>)}
+                    {fonts.map((f, i) => <option key={i} value={f} defaultChecked={toolbarTextOptions.font === f}>{f}</option>)}
 
                 </select>
                 <select
                     name="style"
                     id="style"
                     onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setToolbarTextOptions({ ...toolbarTextOptions, style: event.target.value })}
-                > {styleOption.map(s => <option key={s.value} value={s.value} selected={toolbarTextOptions.style === s.value}>{s.label}</option>)}
+                > {styleOption.map(s => <option key={s.value} value={s.value} defaultChecked={toolbarTextOptions.style === s.value}>{s.label}</option>)}
                 </select>
                 <input
                     className="w-16"
@@ -67,7 +52,7 @@ export default function ToolbarOptionsText() {
                     name="size"
                     id="size"
                     min="1"
-                    value={toolbarTextOptions.size}
+                    defaultValue={toolbarTextOptions.size}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setToolbarTextOptions({ ...toolbarTextOptions, size: +event.target.value })}
                 />
                 <input
@@ -75,7 +60,7 @@ export default function ToolbarOptionsText() {
                     type="color"
                     name="colour"
                     id="colour"
-                    value={toolbarTextOptions.colour}
+                    defaultValue={toolbarTextOptions.colour}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setToolbarTextOptions({ ...toolbarTextOptions, colour: event.target.value })}
                 />
 

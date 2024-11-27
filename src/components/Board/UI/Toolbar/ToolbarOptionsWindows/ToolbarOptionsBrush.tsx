@@ -98,7 +98,6 @@ export default function ToolbarOptionsBrush() {
                                 value={inputHexColour}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputHexColour(event.target.value)}
                                 onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                    console.log(event.target.value)
                                     setCurrentColour(event.target.value)
                                 }} />
                         </>

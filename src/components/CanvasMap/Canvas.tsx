@@ -62,7 +62,6 @@ export default function Canvas({ width, height }: IProps) {
 
             // done moving element
             if (moveElement) {
-                console.log("drop movable")
                 if (selectionIsText(selected) && moveElement instanceof SVGTextElement) {
 
                     const index = textElements.findIndex(t => t.id === selected.id)
@@ -101,11 +100,6 @@ export default function Canvas({ width, height }: IProps) {
                     const offsetX = event.clientX - rect.x;
                     const offsetY = event.clientY - rect.y;
 
-                    console.log("offsetX ", offsetX)
-                    console.log("offsetY ", offsetY)
-
-
-
                     setMoveElementOffset({ x: offsetX, y: offsetY })
 
 
@@ -124,9 +118,6 @@ export default function Canvas({ width, height }: IProps) {
 
                     const offsetX = event.clientX - rect.x;
                     const offsetY = event.clientY - rect.y;
-
-                    console.log("offsetX ", offsetX)
-                    console.log("offsetY ", offsetY)
 
                     setMoveElementOffset({ x: offsetX, y: offsetY })
 
@@ -200,11 +191,16 @@ export default function Canvas({ width, height }: IProps) {
     const zoomPositionHandler = (event: React.WheelEvent<HTMLDivElement>) => {
 
 
-        if (event.deltaY > 0) {
-            if (zoomPosition <= zoomPositionMax)
-                setZoomPosition(zoomPositionMax)
-            else
+        if (event.deltaY > 0 && mapSVG.current !== null) {
+            if (zoomPosition <= zoomPositionMax) {
+
+                setZoomPosition(zoomPosition + scrollSpeed)
+
+            }
+            else {
                 setZoomPosition(zoomPosition - scrollSpeed)
+
+            }
         }
         else
             setZoomPosition(zoomPosition + scrollSpeed)
@@ -228,7 +224,7 @@ export default function Canvas({ width, height }: IProps) {
         }
     }
 
-    function moveMouseHandler(event: React.MouseEvent<HTMLDivElement>) {
+    function moveMouseHandler(event: React.MouseEvent) {
 
 
         if (moveElement !== null) {
@@ -246,8 +242,22 @@ export default function Canvas({ width, height }: IProps) {
         }
     }
 
+    const rightClickHandler = (event: React.MouseEvent<SVGElement>) => {
+
+        event.preventDefault()
+
+        const target = event.target
+
+        if (target instanceof SVGTextElement) {
+
+            setTextElements([...textElements.filter(t => t.id !== target.id)])
+
+        }
+
+
+    }
+
     console.log("render canvas")
-    console.log("selected ", selected)
 
     return (
         <div
@@ -258,14 +268,14 @@ export default function Canvas({ width, height }: IProps) {
             onMouseMove={moveMouseHandler}
             onClick={clickHandler}
         >
-            <svg width={width} height={height} id="svg-canvas">
+            <svg width={width} height={height} id="svg-canvas" onContextMenu={rightClickHandler}>
                 <Map
                     width={width}
                     height={height}
                     data={data}
                     toolBarOption={toolbarOption}
-                    scrollPosition={scrollPosition}
                     zoomPosition={zoomPosition}
+                    scrollPosition={scrollPosition}
                     ref={mapSVG}
                 />
                 {legendIsActive ? <LegendWindow /> : null}

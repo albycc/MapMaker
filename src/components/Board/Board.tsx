@@ -15,7 +15,10 @@ export default function Board() {
     const { selected } = useContext(ToolbarContext)
     const { toolbarOption } = useContext(ToolbarContext)
 
-    return <div id="board" >
+
+    console.log("render board")
+
+    return <div id="board" onContextMenu={(event: React.MouseEvent) => { event.preventDefault(); return false }}>
         <MenuBar />
         <Toolbar />
         <div id="options-position">

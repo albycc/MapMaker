@@ -46,9 +46,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
         d3.select("[stroke=red]").attr("stroke", COLOURS.countryBorderColour).attr("strokeWidth", 0.4)
         if (selectionIsCountry(selected)) {
             d3.select(`#p-${selected.id}`).attr("stroke", "red").attr("strokeWidth", 2)
-        } else if (selected == null) {
         }
-
 
     }, [selected])
 
@@ -63,28 +61,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
                     fillColour = `url(#fillImg-${c.fillColour.label})`
                 d3.select(`#p-${c.id}`).attr("fill", fillColour)
             }
-            // if (c.label) {
-            //     const countryPath = d3.select(`#p-${c.id}`).node()
 
-            //     const geoFeature = data.features.find(f => f.id === c.id)
-
-            //     if (countryPath && geoFeature) {
-
-            //         const path = geoPath()
-
-
-            //         const centerPoint = path.centroid(geoFeature)
-            //         console.log(centerPoint)
-            //         d3.select(`#g-${c.id}`)
-            //             .append("text")
-            //             .text(c.label)
-            //             .attr("x", centerPoint[0])
-            //             .attr("y", centerPoint[1])
-            //         // .attr("transform", `translate(${centerPoint[0]}px, ${centerPoint[1]}px)`)
-
-
-            //     }
-            // }
         })
 
     }, [countryList])
@@ -117,9 +94,6 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
     const removeCountryColourHandler = (event: React.MouseEvent<SVGPathElement>) => {
 
-
-        console.log("remove ", event.currentTarget.getAttribute("data-countryid"))
-
         const id = event.currentTarget.getAttribute("data-countryid")
 
         if (id) {
@@ -131,9 +105,9 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
     return (
         <svg ref={ref}>
-            <g>
+            <g  >
                 <path d={geoPath(projection)(graticule)?.toString()} stroke="#ccc" fill="none"></path>
-            </g>
+            </g >
             <g>
                 {countries.features.map((c, i) => {
                     let path = geoPath().projection(projection)
@@ -147,7 +121,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
                             d={path(c)?.toString()}
                             stroke={COLOURS.countryBorderColour}
                             fill={COLOURS.defaultCountryColour}
-                            strokeWidth={mouseOverCountry === c.id ? 2 : 0.4}
+                            strokeWidth={mouseOverCountry === c.id ? 1 : 0.4}
                             cursor={"Pointer"}
                             onClick={countryOnClickHandler}
                             onContextMenu={removeCountryColourHandler}
@@ -182,7 +156,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
             </g>
 
 
-        </svg>
+        </svg >
     )
 })
 
