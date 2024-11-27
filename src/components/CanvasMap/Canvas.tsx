@@ -11,6 +11,7 @@ import TextElement from "./Elements/TextElement";
 import SpriteElement from "./Elements/SpriteElement";
 import { ToolbarContext } from "../../contexts/toolbarContexts";
 import { selectionIsText } from "../../utils/typeChecks";
+import LegendWindow from "../Board/UI/Legend/LegendWindow";
 
 interface IProps {
     width: number;
@@ -32,7 +33,11 @@ export default function Canvas({ width, height }: IProps) {
     const [scrollMouseDistance, setScrollMouseDistance] = useState<Position>({ x: 0, y: 0 })
     const [zoomPosition, setZoomPosition] = useState<number>(100)
     const [zoomPositionMax, setZoomPositionMax] = useState<number>(zoomPosition)
+
     const [moveElement, setMoveElement] = useState<SVGElement | null>(null)
+    const [moveElementOffset, setMoveElementOffset] = useState<Position>({ x: 0, y: 0 })
+
+    const [legendIsActive, setLegendIsActive] = useState<boolean>(false)
 
     const mapSVG = useRef<SVGSVGElement>(null)
 
@@ -56,22 +61,30 @@ export default function Canvas({ width, height }: IProps) {
         if (toolbarOption === ToolbarOption.Select) {
 
             // done moving element
-            if (selectionIsText(selected) && moveElement instanceof SVGTextElement) {
+            if (moveElement) {
+                console.log("drop movable")
+                if (selectionIsText(selected) && moveElement instanceof SVGTextElement) {
 
-                const index = textElements.findIndex(t => t.id === selected.id)
+                    const index = textElements.findIndex(t => t.id === selected.id)
 
-                if (index !== -1) {
+                    if (index !== -1) {
 
-                    const rect = moveElement.getBoundingClientRect()
+                        textElements[index].position = { x: event.clientX - moveElementOffset.x, y: event.clientY - moveElementOffset.y }
 
-                    textElements[index].position = { x: rect.x, y: rect.y }
+                        setTextElements([...textElements])
 
-                    setTextElements([...textElements])
+                        setMoveElement(null)
+                    }
 
+                    // click country to open country window
+                } else if (moveElement instanceof SVGSVGElement && moveElement.id === "legend") {
+
+                    d3.select(`#${moveElement.id}`).attr("x", event.clientX - moveElementOffset.x).attr("y", event.clientY - moveElementOffset.y)
                     setMoveElement(null)
-                }
 
-            } else if (target instanceof SVGPathElement && target.getAttribute("data-countryid")) {
+                }
+            }
+            else if (target instanceof SVGPathElement && target.getAttribute("data-countryid")) {
                 const countryId = target.getAttribute("data-countryid")
                 if (countryId !== null) {
                     setSelectedCountry(countryId)
@@ -82,11 +95,45 @@ export default function Canvas({ width, height }: IProps) {
                 const text = textElements.find(t => t.id === target.id)
 
                 if (selectionIsText(selected) && target.id === selected.id) {
+
+                    const rect = target.getBoundingClientRect()
+
+                    const offsetX = event.clientX - rect.x;
+                    const offsetY = event.clientY - rect.y;
+
+                    console.log("offsetX ", offsetX)
+                    console.log("offsetY ", offsetY)
+
+
+
+                    setMoveElementOffset({ x: offsetX, y: offsetY })
+
+
                     setMoveElement(target)
                 } else if (text !== undefined) {
                     setSelectedText(text)
                 }
-            } else {
+
+            } else if (target instanceof SVGRectElement && target.id === "legend-frame") {
+
+                const legendFrame = d3.select("#legend").node()
+
+                if (legendFrame instanceof SVGSVGElement) {
+
+                    const rect = target.getBoundingClientRect()
+
+                    const offsetX = event.clientX - rect.x;
+                    const offsetY = event.clientY - rect.y;
+
+                    console.log("offsetX ", offsetX)
+                    console.log("offsetY ", offsetY)
+
+                    setMoveElementOffset({ x: offsetX, y: offsetY })
+
+                    setMoveElement(legendFrame)
+                }
+            }
+            else {
                 setSelectedText(null)
             }
 
@@ -101,7 +148,6 @@ export default function Canvas({ width, height }: IProps) {
                     setSelectedText(textElement)
 
                     return
-
                 }
             }
 
@@ -119,6 +165,10 @@ export default function Canvas({ width, height }: IProps) {
             }
             setInitTextFirstTime(true)
             setTextEdit(text)
+
+        } else if (toolbarOption === ToolbarOption.Legend) {
+
+            setLegendIsActive(true)
 
         }
     }
@@ -160,6 +210,7 @@ export default function Canvas({ width, height }: IProps) {
             setZoomPosition(zoomPosition + scrollSpeed)
     }
 
+    // handler for user when dragging the canvas with the middle mouse
     const scrollPositionDownHandler = (event: React.MouseEvent) => {
 
         if (event.button === 1) {
@@ -181,16 +232,11 @@ export default function Canvas({ width, height }: IProps) {
 
 
         if (moveElement !== null) {
-            const rect = moveElement.getBoundingClientRect()
 
-            const offsetX = event.clientX - rect.x;
-            const offsetY = event.clientY - rect.y;
+            d3.select(`#${moveElement.id}`)
+                .attr("x", event.clientX - moveElementOffset.x)
+                .attr("y", event.clientY - moveElementOffset.y)
 
-            if (moveElement instanceof SVGTextElement) {
-                d3.select(`#${moveElement.id}`)
-                    .attr("x", rect.x + offsetX)
-                    .attr("y", rect.y + offsetY)
-            }
         }
 
         if (scrollCanvasMode) {
@@ -222,6 +268,7 @@ export default function Canvas({ width, height }: IProps) {
                     zoomPosition={zoomPosition}
                     ref={mapSVG}
                 />
+                {legendIsActive ? <LegendWindow initialPosition={{ x: 300, y: 500 }} /> : null}
 
                 {textElements.map(t => (
                     <TextElement

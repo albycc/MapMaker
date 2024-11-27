@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Position } from "../../types/Position";
-import { IText } from "./element-types";
 import { ToolbarContext } from "../../../contexts/toolbarContexts";
 import { ToolbarOption } from "../../Board/UI/Toolbar/Toolbar-types";
 import { selectionIsText } from "../../../utils/typeChecks";
+import * as d3 from "d3"
 
 interface IProps {
     id: string;
@@ -22,6 +22,26 @@ export default function TextElement(props: IProps) {
 
     const [editing, setEditing] = useState<boolean>(true)
     const { toolbarOption, selected } = useContext(ToolbarContext)
+    const [selectionRect, setSelectionRect] = useState({ x: 0, y: 0, width: 0, height: 0 })
+
+    useEffect(() => {
+
+        if (selectionIsText(selected)) {
+            if (props.isMoving === false) {
+                const target = d3.select(`#${selected.id}`).node()
+
+                if (target instanceof SVGElement) {
+
+                    const rect = target.getBoundingClientRect()
+
+                    setSelectionRect({ x: rect.x, y: rect.y, width: rect.width, height: rect.height })
+
+                }
+            }
+
+        }
+
+    }, [selected, props.isMoving])
 
     const handleText = (newText: string) => {
         if (props.initText && newText === "") {
@@ -40,7 +60,6 @@ export default function TextElement(props: IProps) {
 
         if (toolbarOption === ToolbarOption.Text) {
             setEditing(true)
-
         }
     }
 
@@ -48,23 +67,21 @@ export default function TextElement(props: IProps) {
         <>
             {editing ?
                 (
-                    <foreignObject x={props.position.x} y={props.position.y - 15} width="110" height="100">
-                        <div className="bg-orange-400 flex">
-                            <input
-                                className="w-full px-2 border-none"
-                                style={{ fontSize: props.size }}
-                                type="text"
-                                name=""
-                                id=""
-                                defaultValue={props.text}
-                                onBlur={(event: React.ChangeEvent<HTMLInputElement>) => handleText(event.currentTarget.value)}
-                                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-                                    console.log(event.key)
-                                    if (event.key === "Enter") handleText(event.currentTarget.value)
-                                }}
-                                autoFocus
-                            />
-                        </div>
+                    <foreignObject x={props.position.x} y={props.position.y - 15} width="100%" height="100">
+                        <input
+                            className="w-full px-2 border-none focus:outline-none bg-transparent"
+                            style={{ fontSize: props.size, color: props.colour }}
+                            type="text"
+                            name=""
+                            id=""
+                            defaultValue={props.text}
+                            onBlur={(event: React.ChangeEvent<HTMLInputElement>) => handleText(event.currentTarget.value)}
+                            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                                if (event.key === "Enter") handleText(event.currentTarget.value)
+                            }}
+                            autoFocus
+                        />
+
                     </foreignObject>
                 )
                 : (
@@ -76,16 +93,23 @@ export default function TextElement(props: IProps) {
                             onClick={textClickHandler}
                             className={toolbarOption === ToolbarOption.Text ? "cursor-text" : "cursor-pointer"}
                             fontSize={props.size + "px"}
-                            style={{ fontFamily: props.font, fontWeight: props.style === "bold" ? "bold" : "normal", fontStyle: props.style }}
+                            style={{
+                                fontFamily: props.font,
+                                fontWeight: props.style === "bold" ? "bold" : "normal",
+                                fontStyle: props.style,
+                                color: props.colour
+                            }}
+                            fill={props.colour}
                         >
                             {props.text}
                         </text>
                         {selected?.id === props.id && !props.isMoving ? (
                             <rect
-                                x={props.position.x}
-                                y={props.position.y - 15}
-                                width="100"
-                                height="20"
+                                id={props.id + "-rect"}
+                                x={selectionRect.x}
+                                y={selectionRect.y}
+                                width={selectionRect.width}
+                                height={selectionRect.height}
                                 stroke="blue"
                                 fill="none"
                             ></rect>) : null}

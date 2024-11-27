@@ -1,8 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import ToolbarOptionsWindow from "./ToolbarOptionsWindow";
 import { ToolbarContext } from "../../../../../contexts/toolbarContexts";
 import { fonts } from "../../../../../constants/fonts";
-import { selectionIsText } from "../../../../../utils/typeChecks";
 
 export type IToolbarOptionsText = {
     font: string;
@@ -32,7 +31,7 @@ export default function ToolbarOptionsText() {
 
     useEffect(() => {
 
-        // console.log(selected)
+        console.log("ToolbarOptionsText: ", selected)
 
         // if (selectionIsText(selected)) {
         //     setToolbarTextOptions({
@@ -44,16 +43,6 @@ export default function ToolbarOptionsText() {
         // }
 
     }, [selected])
-
-    const inputChanged = (event: React.ChangeEvent<HTMLElement>) => {
-
-        console.log(event.target.id)
-        console.log(event.currentTarget)
-
-
-
-    }
-
 
     return (
         <ToolbarOptionsWindow>
