@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react"
-import { BoardContext } from "../../../../../contexts/boardContexts"
 import { Img } from "../../../../types/Image"
 import { ToolbarContext } from "../../../../../contexts/toolbarContexts"
 import ToolbarOptionsWindow from "./ToolbarOptionsWindow"

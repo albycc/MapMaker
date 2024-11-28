@@ -1,7 +1,5 @@
 import { createContext, useState } from "react";
 import { ICountry } from "../types/CountriesTypes";
-import { data } from "../data/data"
-import { ILegend } from "../types/LegendTypes";
 
 type IBoardContextType = {
     editCountry: (country: ICountry) => void,
@@ -23,32 +21,6 @@ type IProps = {
 
 export default function BoardContextProvider({ children }: IProps) {
     const [countryList, setCountryList] = useState<ICountry[]>([])
-
-    // const setCountryHandler = (countryId: string | null) => {
-
-    //     const featureFound = data.features.find(feature => feature.id === countryId)
-
-    //     if (countryId !== null && featureFound && featureFound.properties && featureFound.id) {
-
-    //         const id = typeof featureFound.id === "number" ? featureFound.id.toString() : featureFound.id;
-    //         const countryExists = countryList.find(c => c.id === countryId)
-
-    //         if (countryExists) {
-
-    //             setSelectedCountry(countryExists)
-
-    //         } else {
-    //             const country: ICountry = {
-    //                 id: id,
-    //                 name: featureFound.properties.name,
-    //                 fillHexColour: null
-    //             }
-    //             setSelectedCountry(country)
-    //         }
-    //     } else {
-    //         setSelectedCountry(null)
-    //     }
-    // }
 
     const editCountryList = (newCountries: ICountry[]) => {
 
@@ -94,8 +66,6 @@ export default function BoardContextProvider({ children }: IProps) {
 
 
     }
-
-
 
     return (
         <BoardContext.Provider value={{ editCountry: editCountryHandler, removeCountryColour, countryList, editCountryList }}>

@@ -2,13 +2,11 @@ import Map from "./Map"
 import { data } from "../../data/data"
 import * as d3 from "d3"
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { BoardContext } from "../../contexts/boardContexts";
 import styles from "./Canvas-styles.module.css"
 import { ToolbarOption } from "../Board/UI/Toolbar/Toolbar-types";
 import { Position } from '../types/Position';
-import { ISprite, IText } from "./Elements/element-types";
+import { IText } from "./Elements/element-types";
 import TextElement from "./Elements/TextElement";
-import SpriteElement from "./Elements/SpriteElement";
 import { ToolbarContext } from "../../contexts/toolbarContexts";
 import { selectionIsText } from "../../utils/typeChecks";
 import LegendWindow from "../Board/UI/Legend/LegendWindow";
@@ -18,9 +16,6 @@ interface IProps {
     height: number;
 }
 
-const scrollSpeed = 25
-
-
 export default function Canvas({ width, height }: IProps) {
 
     const { setSelectedCountry, toolbarOption, setSelectedText, selected, toolbarTextOptions } = useContext(ToolbarContext)
@@ -29,30 +24,12 @@ export default function Canvas({ width, height }: IProps) {
     const [initTextFirstTime, setInitTextFirstTime] = useState<boolean>(false) //checks when user clicks on canvas with create text tool
     const [textEdit, setTextEdit] = useState<IText | null>(null)
 
-    const [scrollPosition, setScrollPosition] = useState<Position>({ x: width / 2, y: height / 2 })
-    const [scrollMouseDistance, setScrollMouseDistance] = useState<Position>({ x: 0, y: 0 })
-    const [zoomPosition, setZoomPosition] = useState<number>(100)
-    const [zoomPositionMax, setZoomPositionMax] = useState<number>(zoomPosition)
-
     const [moveElement, setMoveElement] = useState<SVGElement | null>(null)
     const [moveElementOffset, setMoveElementOffset] = useState<Position>({ x: 0, y: 0 })
 
     const [legendIsActive, setLegendIsActive] = useState<boolean>(false)
 
     const mapSVG = useRef<SVGSVGElement>(null)
-
-    const [scrollCanvasMode, setScrollCanvasMode] = useState<boolean>(false)
-
-    useEffect(() => {
-        if (mapSVG.current !== null) {
-            const svgWidth = mapSVG.current.getBoundingClientRect().width
-            const scale = width / svgWidth * 100
-
-            setZoomPositionMax(scale)
-            setZoomPosition(scale)
-        }
-
-    }, [])
 
     const clickHandler = (event: React.MouseEvent<HTMLDivElement>) => {
 
@@ -160,7 +137,6 @@ export default function Canvas({ width, height }: IProps) {
         } else if (toolbarOption === ToolbarOption.Legend) {
 
             setLegendIsActive(true)
-
         }
     }
 
@@ -175,7 +151,6 @@ export default function Canvas({ width, height }: IProps) {
 
             setTextElements(textList)
         }
-
     }
 
     const insertTextElementHandler = (text: string) => {
@@ -188,94 +163,27 @@ export default function Canvas({ width, height }: IProps) {
         }
     }
 
-    const zoomPositionHandler = (event: React.WheelEvent<HTMLDivElement>) => {
-
-
-        if (event.deltaY > 0 && mapSVG.current !== null) {
-            if (zoomPosition <= zoomPositionMax) {
-
-                setZoomPosition(zoomPosition + scrollSpeed)
-
-            }
-            else {
-                setZoomPosition(zoomPosition - scrollSpeed)
-
-            }
-        }
-        else
-            setZoomPosition(zoomPosition + scrollSpeed)
-    }
-
-    // handler for user when dragging the canvas with the middle mouse
-    const scrollPositionDownHandler = (event: React.MouseEvent) => {
-
-        if (event.button === 1) {
-            setScrollCanvasMode(true)
-            const offsetX = scrollPosition.x - event.clientX
-            const offsetY = scrollPosition.y - event.clientY
-            setScrollMouseDistance({ x: offsetX, y: offsetY })
-        }
-    }
-
-    const scrollPositionUpHandler = (event: React.MouseEvent) => {
-
-        if (event.button === 1) {
-            setScrollCanvasMode(false)
-        }
-    }
-
     function moveMouseHandler(event: React.MouseEvent) {
-
 
         if (moveElement !== null) {
 
             d3.select(`#${moveElement.id}`)
                 .attr("x", event.clientX - moveElementOffset.x)
                 .attr("y", event.clientY - moveElementOffset.y)
-
-        }
-
-        if (scrollCanvasMode) {
-            const x = event.clientX + scrollMouseDistance.x
-            const y = event.clientY + scrollMouseDistance.y
-            setScrollPosition({ x, y })
         }
     }
-
-    const rightClickHandler = (event: React.MouseEvent<SVGElement>) => {
-
-        event.preventDefault()
-
-        const target = event.target
-
-        if (target instanceof SVGTextElement) {
-
-            setTextElements([...textElements.filter(t => t.id !== target.id)])
-
-        }
-
-
-    }
-
-    console.log("render canvas")
 
     return (
         <div
             className={styles["canvas-container"] + toolbarOption === ToolbarOption.Paint ? styles["paint-cursor"] : ""}
-            onWheel={zoomPositionHandler}
-            onMouseDown={scrollPositionDownHandler}
-            onMouseUp={scrollPositionUpHandler}
             onMouseMove={moveMouseHandler}
             onClick={clickHandler}
         >
-            <svg width={width} height={height} id="svg-canvas" onContextMenu={rightClickHandler}>
+            <svg width={width} height={height} id="svg-canvas" >
                 <Map
                     width={width}
                     height={height}
                     data={data}
-                    toolBarOption={toolbarOption}
-                    zoomPosition={zoomPosition}
-                    scrollPosition={scrollPosition}
                     ref={mapSVG}
                 />
                 {legendIsActive ? <LegendWindow /> : null}
