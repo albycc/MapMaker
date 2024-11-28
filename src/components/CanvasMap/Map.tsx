@@ -1,13 +1,17 @@
 import * as d3 from "d3"
 import { geoPath } from "d3-geo";
 import { Feature, FeatureCollection } from "geojson";
-import React, { forwardRef, useContext, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useState } from "react";
 
 import { BoardContext } from "../../contexts/boardContexts";
 import { ToolbarOption } from "../Board/UI/Toolbar/Toolbar-types";
 import { ICountry } from "../../types/CountriesTypes";
 import { FeatureCollectionExt } from "../../data/data";
 import { Position } from "../types/Position";
+import { ToolbarContext } from "../../contexts/toolbarContexts";
+import { COLOURS } from "../../constants/colours";
+import { Img } from "../types/Image";
+import { selectionIsCountry } from "../../utils/typeChecks";
 
 // import data from "../data/custom.geo.json"
 
@@ -27,7 +31,8 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
     const [countries, setCountries] = useState<FeatureCollection>(data)
 
-    const { selectedCountry, setSelectedCountry, countryList, editCountry, currentColour } = useContext(BoardContext)
+    const { currentColour, selected, setSelectedCountry, images } = useContext(ToolbarContext)
+    const { countryList, editCountry, removeCountryColour } = useContext(BoardContext)
 
     // add a projection so d3 will convert what type of map we shall see
     // scale will zoom the map
@@ -36,22 +41,35 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
     const graticule = d3.geoGraticule10();
 
+    useEffect(() => {
 
-    const fillCountryColour = (c: Feature) => {
-        let fillColour = "#e7e7e7";
-
-        const countryFound = countryList.find(cntr => cntr.id === c.id);
-
-        if (countryFound && countryFound.fillHexColour) {
-            fillColour = countryFound.fillHexColour
+        d3.select("[stroke=red]").attr("stroke", COLOURS.countryBorderColour).attr("strokeWidth", 0.4)
+        if (selectionIsCountry(selected)) {
+            d3.select(`#p-${selected.id}`).attr("stroke", "red").attr("strokeWidth", 2)
         }
 
-        return fillColour
-    }
+    }, [selected])
+
+    useEffect(() => {
+
+        countryList.forEach(c => {
+            let fillColour = ""
+            if (c.fillColour) {
+                if (typeof c.fillColour === "string")
+                    fillColour = c.fillColour
+                else
+                    fillColour = `url(#fillImg-${c.fillColour.label})`
+                d3.select(`#p-${c.id}`).attr("fill", fillColour)
+            }
+
+        })
+
+    }, [countryList])
+
 
     const countryOnClickHandler = (event: React.MouseEvent) => {
 
-        const id = event.currentTarget.getAttribute("data-id")
+        const id = event.currentTarget.getAttribute("data-countryid")
         const name = event.currentTarget.getAttribute("data-name")
         if (id && name) {
             if (toolBarOption === ToolbarOption.Select) {
@@ -59,10 +77,14 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
 
             }
             if (toolBarOption === ToolbarOption.Paint) {
+
+                // right clicking removes country colour
+
+
                 const countryForm: ICountry = {
                     id,
                     name: name,
-                    fillHexColour: currentColour
+                    fillColour: currentColour
                 }
                 editCountry(countryForm)
             }
@@ -70,35 +92,71 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, toolBar
     }
 
 
+    const removeCountryColourHandler = (event: React.MouseEvent<SVGPathElement>) => {
+
+        const id = event.currentTarget.getAttribute("data-countryid")
+
+        if (id) {
+            removeCountryColour(id)
+            d3.select(`#p-${id}`).attr("fill", COLOURS.defaultCountryColour)
+
+        }
+    }
+
     return (
         <svg ref={ref}>
-            <g>
+            <g  >
                 <path d={geoPath(projection)(graticule)?.toString()} stroke="#ccc" fill="none"></path>
+            </g >
+            <g>
+                {countries.features.map((c, i) => {
+                    let path = geoPath().projection(projection)
+                    const countryLabel = countryList.find(cl => cl.id === c.id)?.label
+                    const centerPoint = path.centroid(c)
+                    return <g key={c.id} id={"g-" + c.id}>
+                        <path
+                            data-countryid={c.id}
+                            id={"p-" + c.id}
+                            data-name={c.properties!.name}
+                            d={path(c)?.toString()}
+                            stroke={COLOURS.countryBorderColour}
+                            fill={COLOURS.defaultCountryColour}
+                            strokeWidth={mouseOverCountry === c.id ? 1 : 0.4}
+                            cursor={"Pointer"}
+                            onClick={countryOnClickHandler}
+                            onContextMenu={removeCountryColourHandler}
+                            onMouseOver={() => {
+                                if (c.id) {
+                                    setMouseOverCountry(c.id)
+
+                                }
+                            }}
+                            onMouseLeave={() => { setMouseOverCountry("") }}
+                        >
+                        </path>
+                        {countryLabel ? (
+
+                            <text style={{ textAlign: "center", transform: `translate(${centerPoint[0]}px, ${centerPoint[1]}px)` }}>{countryLabel}</text>
+                        ) : null}
+                    </g>
+                }
+                )}
             </g>
             <g>
-                {countries.features.map((c, i) =>
-                    <path
-                        key={c.id}
-                        data-id={c.id}
-                        data-name={c.properties!.name}
-                        d={geoPath().projection(projection)(c)?.toString()}
-                        stroke={selectedCountry && selectedCountry.id === c.id ? "#ff0000" : "#7f7f7f"}
-                        fill={fillCountryColour(c)}
-                        strokeWidth={(selectedCountry && selectedCountry.id === c.id) || (c.id === mouseOverCountry) ? 2 : 0.4}
-                        cursor={"Pointer"}
-                        onClick={countryOnClickHandler}
-                        onMouseOver={() => {
-                            if (c.id) {
-                                setMouseOverCountry(c.id)
+                {images.map(i => {
+                    return (
+                        <defs>
+                            <pattern id={"fillImg-" + i.label} patternUnits="userSpaceOnUse" width="400px" height="400px">
+                                <image href={i.src} x="0" y="0" width="400px" height="400px" />
+                            </pattern>
+                        </defs>
 
-                            }
-                        }}
-                        onMouseLeave={() => { setMouseOverCountry("") }}
-                    />)}
+                    )
+                })}
             </g>
 
 
-        </svg>
+        </svg >
     )
 })
 
