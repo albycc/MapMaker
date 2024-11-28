@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import WindowCard from "../../globals/WindowCard";
+import * as d3 from "d3"
 
 
 export default function ExportImportWindowOptions() {
@@ -9,15 +10,18 @@ export default function ExportImportWindowOptions() {
     const [imageWidth, setImageWidth] = useState<number>(1920)
     const [imageHeight, setImageHeight] = useState<number>(1080)
 
+    const exportButtonHandler = () => {
 
 
-    const exportButtonHandler = (event: React.MouseEvent) => {
+        const svgCanvas: SVGSVGElement = d3.select("#svg-canvas").node() as SVGSVGElement
 
-        const svg: SVGSVGElement = document.querySelector("#svg-canvas") as SVGSVGElement
+        const noexports = d3.selectAll("[data-noexport]")
 
-        if (svg) {
+        noexports.attr("visibility", "hidden")
+
+        if (svgCanvas) {
             const img = new Image();
-            const svgStr = (new XMLSerializer()).serializeToString(svg)
+            const svgStr = (new XMLSerializer()).serializeToString(svgCanvas)
             const svgBlob = new Blob([svgStr], {
                 type: 'image/svg+xml;charset=utf-8'
             });
@@ -49,6 +53,8 @@ export default function ExportImportWindowOptions() {
                     a.target = '_blank';
                     a.href = imgURI;
 
+                    noexports.attr("visibility", null)
+
                     // trigger download button
                     // (set `bubbles` to false here.
                     // or just `a.click()` if you don't care about bubbling)
@@ -61,35 +67,17 @@ export default function ExportImportWindowOptions() {
                 }
 
             };
-
-            // const width = 1920;
-            // const height = 1080;
-
-            // canvas.getContext("2d")?.drawImage(img, 0, 0, width, height)
-
-            // const imgURL = canvas.toDataURL("image/png")
-
-            // const link = document.createElement("a");
-            // link.download = "image";
-            // link.href = imgURL;
-            // link.dataset.downloadurl = ["image/png", link.download, link.href].join(':');
-
-            // document.body.appendChild(link);
-            // link.click();
-            // document.body.removeChild(link);
         }
-
-
     }
     return (
-        <WindowCard position={{ right: 20, top: 10 }}>
+        <WindowCard position={{ right: 0, top: 10 }}>
             <div className="flex my-4">
                 <input
                     className="w-32 border rounded border-slate-300"
                     type="number"
                     name="width"
                     id="width"
-                    value={imageWidth}
+                    defaultValue={imageWidth}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setImageWidth(+event.target.value)}
                 />
                 <input
@@ -97,7 +85,7 @@ export default function ExportImportWindowOptions() {
                     type="number"
                     name="height"
                     id="height"
-                    value={imageHeight}
+                    defaultValue={imageHeight}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setImageHeight(+event.target.value)}
                 />
 
@@ -110,7 +98,7 @@ export default function ExportImportWindowOptions() {
                     id=""
                     onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setFileType(event.target.value)}
                 >
-                    <option value="png" selected>PNG</option>
+                    <option value="png" defaultChecked>PNG</option>
                     <option value="jpeg">JPG</option>
                 </select>
             </div>

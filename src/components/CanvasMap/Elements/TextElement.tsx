@@ -108,6 +108,7 @@ export default function TextElement(props: IProps) {
                                 id={props.id + "-rect"}
                                 x={selectionRect.x}
                                 y={selectionRect.y}
+                                data-noexport
                                 width={selectionRect.width}
                                 height={selectionRect.height}
                                 stroke="blue"

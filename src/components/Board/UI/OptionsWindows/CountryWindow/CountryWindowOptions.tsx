@@ -20,8 +20,6 @@ export default function CountryWindow({ width, country }: IProps) {
 
     const [inputColour, setInputColour] = useState<string>(defaultColour)
 
-    console.log("selectedCountry ", selected)
-
     useEffect(() => {
 
     }, [inputColour])
@@ -75,7 +73,6 @@ export default function CountryWindow({ width, country }: IProps) {
                                     value={inputColour}
                                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInputColour(event.target.value)}
                                     onBlur={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        console.log(event.target.value)
                                         const countryForm: ICountry = {
                                             id: country.id,
                                             name: country.name,

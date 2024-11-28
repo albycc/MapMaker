@@ -4,6 +4,8 @@ import { ToolbarOption } from "../Toolbar/Toolbar-types";
 import { ToolbarContext } from "../../../../contexts/toolbarContexts";
 import deleteIcon from "../../../../icons/delete_icon.png"
 import * as d3 from "d3"
+import { MenubarContext } from "../../../../contexts/menubarContexts";
+import { MenubarOption } from "../MenuBar/MenuBar-Types";
 
 
 export default function LegendWindow() {
@@ -11,6 +13,7 @@ export default function LegendWindow() {
     const [legend, setLegend] = useState<ILegend[]>([])
 
     const { currentColour, setCurrentColour, toolbarOption, toolbarLegendStyles, setToolbarLegendStyles } = useContext(ToolbarContext)
+    const { menubarOption } = useContext(MenubarContext)
     const [newColour, setNewColour] = useState<string>("")
     const [legendTitle, setLegendTitle] = useState<string>("Legend title")
     const [legendTitleEditMode, setLegendTitleEditMode] = useState<boolean>(false)
@@ -93,7 +96,6 @@ export default function LegendWindow() {
         <svg id="legend">
             {toolbarLegendStyles !== null ?
                 <>
-
                     <rect
                         id="legend-frame"
                         width={300}
@@ -166,6 +168,7 @@ export default function LegendWindow() {
                                     )
                                 }
                                 {toolbarOption !== ToolbarOption.Paint ? <image
+                                    data-noexport
                                     href={deleteIcon}
                                     x="250"
                                     width="20"
@@ -179,14 +182,21 @@ export default function LegendWindow() {
                         }
                     </g>
 
-                    <foreignObject x={20} y={50 + legend.length * 50} width="250" height="100">
-                        <div className="flex bg-gray-100">
-                            <input className="w-6" type="color" name="" id="new-legend" value={newColour} onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setNewColour(event.target.value)
-                            }} />
+                    {menubarOption !== MenubarOption.Export ? <foreignObject x={20} y={50 + legend.length * 50} width="250" height="100">
+                        <div className="flex bg-gray-100" >
+                            <input
+                                className="w-6"
+                                type="color"
+                                name="new-legend"
+                                id="new-legend"
+                                value={newColour}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                    setNewColour(event.target.value)
+                                }}
+                            />
                             <button className="text-gray-500  w-full" onClick={() => addLegendColourHandler()}>New legend</button>
                         </div>
-                    </foreignObject>
+                    </foreignObject> : null}
                 </>
 
                 : null}

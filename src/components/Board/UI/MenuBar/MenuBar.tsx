@@ -1,30 +1,41 @@
 
-import { useState } from "react"
+import { useContext } from "react"
 import Icon from "../globals/Icon";
-
 import mapIcon from "../../../../icons/menubar/map.png"
-import listIcon from "../../../../icons/menubar/list.png"
 import exportimportIcon from "../../../../icons/menubar/exportimport.png"
 import MapWindowOptions from "./MenuBarWindows/MapWindowOptions";
-import ListWindowOptions from "./MenuBarWindows/ListWindowOptions";
 import ExportImportWindowOptions from "./MenuBarWindows/ExportImportWindowOptions";
+import { MenubarOption } from "./MenuBar-Types";
+import { MenubarContext } from "../../../../contexts/menubarContexts";
 
 const menus = [{
     label: "Map",
     file: mapIcon
 },
 {
-    label: "List",
-    file: listIcon
-},
-{
-    label: "Import/Export",
+    label: "Export",
     file: exportimportIcon
 }]
 
 export default function MenuBar() {
 
-    const [activeMenu, setActiveMenu] = useState<string>("");
+    const { menubarOption, setMenubarOption } = useContext(MenubarContext)
+
+    const menuItemClickedHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+
+        const target = event.currentTarget as any
+
+        const label: MenubarOption = target.value
+
+        if (label === menubarOption) {
+            setMenubarOption(null)
+            return
+        }
+
+
+        setMenubarOption(Object.keys(MenubarOption)[Object.values(MenubarOption).indexOf(label)] as MenubarOption)
+
+    }
 
     return (
         <div className="absolute" style={{ right: 30, top: 20 }} >
@@ -32,17 +43,17 @@ export default function MenuBar() {
                 {menus.map((menu) => (
                     <button
                         key={menu.label}
-                        className={menu.label === activeMenu ? "bg-cyan-100" : ""}
-                        onClick={() => setActiveMenu(activeMenu === menu.label ? "" : menu.label)}>
+                        value={menu.label}
+                        className={menubarOption === menu.label ? "bg-cyan-100" : ""}
+                        onClick={menuItemClickedHandler}>
                         <Icon file={menu.file} size={50} />
                     </button>
                 ))}
 
             </div>
             <div className="relative">
-                {activeMenu === "Map" && <MapWindowOptions />}
-                {activeMenu === "List" && <ListWindowOptions />}
-                {activeMenu === "Import/Export" && <ExportImportWindowOptions />}
+                {menubarOption === MenubarOption.Map && <MapWindowOptions />}
+                {menubarOption === MenubarOption.Export && <ExportImportWindowOptions />}
             </div>
         </div>
     )

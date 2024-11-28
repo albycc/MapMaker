@@ -1,6 +1,7 @@
 import './App.css';
 import Board from './components/Board/Board';
 import BoardContextProvider from './contexts/boardContexts';
+import MenubarContextProvider from './contexts/menubarContexts';
 import ToolbarContextProvider from './contexts/toolbarContexts';
 
 function App() {
@@ -10,14 +11,11 @@ function App() {
   return (
     <BoardContextProvider>
       <ToolbarContextProvider>
-        <div className="overflow-hidden w-screen h-screen ">
+        <MenubarContextProvider>
           <Board />
 
-        </div>
-
-
+        </MenubarContextProvider>
       </ToolbarContextProvider>
-
     </BoardContextProvider>
   );
 }
