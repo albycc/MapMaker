@@ -92,8 +92,8 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
             .attr("fill", mapStyles.defaultCountryColour)
             .attr("stroke-width", (c) => 0.4)
             .attr("cursor", "pointer")
-            // .on("click", countryOnClickHandler)
-            // .on("contextmenu", removeCountryColourHandler)
+            .on("click", countryOnClickHandler)
+            .on("contextmenu", removeCountryColourHandler)
             .on("mouseover", (e, d: Feature) => {
                 if (d.id)
                     d3.select(`#p-${d.id}`)
@@ -150,6 +150,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
             .attr("width", 400)
             .attr("height", 400)
 
+
     }, [countryList, toolbarOption, selected, projectionType, mapStyles, currentColour])
 
     function countryOnClickHandler(event: PointerEvent, data: Feature) {
@@ -158,9 +159,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
 
             const id = `${data.id}`
             const name = data.properties.name
-            if (toolbarOption === ToolbarOption.Select) {
-                setSelectedCountry(`${data.id}`)
-            }
+
             if (toolbarOption === ToolbarOption.Paint) {
 
                 // right clicking removes country colour
@@ -178,6 +177,16 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
         if (event.currentTarget !== null) {
 
         }
+    }
+
+    const removeCountryColourHandler = (event: PointerEvent, data: Feature) => {
+
+        event.preventDefault()
+
+        if (data.id)
+            removeCountryColour(`${data.id}`)
+
+
     }
 
     return (

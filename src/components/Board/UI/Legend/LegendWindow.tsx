@@ -6,6 +6,7 @@ import deleteIcon from "../../../../icons/delete_icon.png"
 import * as d3 from "d3"
 import { MenubarContext } from "../../../../contexts/menubarContexts";
 import { MenubarOption } from "../MenuBar/MenuBar-Types";
+import { Position } from "../../../types/Position";
 
 
 export default function LegendWindow() {
@@ -17,6 +18,7 @@ export default function LegendWindow() {
     const [newColour, setNewColour] = useState<string>("")
     const [legendTitle, setLegendTitle] = useState<string>("Legend title")
     const [legendTitleEditMode, setLegendTitleEditMode] = useState<boolean>(false)
+    const [delta, setDelta] = useState<Position>({ x: 0, y: 0 })
 
     const [legendRowEdit, setLegendRowEdit] = useState<ILegend | null>(null)
 
@@ -47,6 +49,29 @@ export default function LegendWindow() {
         document.addEventListener("click", mouseTrack)
 
     }, [])
+
+    useEffect(() => {
+        const legendElement = d3.select("#legend")
+
+        const call: any = d3.drag()
+            .on("start", function (event) {
+
+                setDelta({
+                    x: +legendElement.attr("x") - event.sourceEvent.clientX,
+                    y: +legendElement.attr("y") - event.sourceEvent.clientY,
+                })
+            })
+            .on("drag", function (event) {
+
+                legendElement
+                    .attr("x", event.sourceEvent.clientX + delta.x)
+                    .attr("y", event.sourceEvent.clientY + delta.y)
+            })
+
+
+        call(d3.select(legendElement.node()))
+
+    }, [delta])
 
 
     const addLegendColourHandler = () => {
