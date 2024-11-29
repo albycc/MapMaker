@@ -26,7 +26,7 @@ export default function TextElement(props: IProps) {
 
     useEffect(() => {
 
-        if (selectionIsText(selected)) {
+        if (selectionIsText(selected) && selected.id === props.id) {
             if (props.isMoving === false) {
                 const target = d3.select(`#${selected.id}`).node()
 
@@ -35,7 +35,6 @@ export default function TextElement(props: IProps) {
                     const rect = target.getBoundingClientRect()
 
                     setSelectionRect({ x: rect.x, y: rect.y, width: rect.width, height: rect.height })
-
                 }
             }
 
@@ -45,22 +44,23 @@ export default function TextElement(props: IProps) {
 
     const handleText = (newText: string) => {
         if (props.initText && newText === "") {
+            console.log("empty init text")
             props.initText("")
             return
         } else if (props.initText && newText !== "") {
+            console.log("new init text")
             props.initText(newText)
         }
 
         setEditing(false)
         props.onTextFinished(props.id, newText)
-
     }
 
-    const textClickHandler = (event: React.MouseEvent<SVGTextElement>) => {
+    const textClickHandler = () => {
 
-        if (toolbarOption === ToolbarOption.Text) {
+        if (toolbarOption === ToolbarOption.Text)
             setEditing(true)
-        }
+
     }
 
     return (
@@ -70,10 +70,8 @@ export default function TextElement(props: IProps) {
                     <foreignObject x={props.position.x} y={props.position.y - 15} width="100%" height="100">
                         <input
                             className="w-full px-2 border-none focus:outline-none bg-transparent"
-                            style={{ fontSize: props.size, color: props.colour }}
+                            style={{ fontSize: props.size, color: props.colour, fontFamily: props.font }}
                             type="text"
-                            name=""
-                            id=""
                             defaultValue={props.text}
                             onBlur={(event: React.ChangeEvent<HTMLInputElement>) => handleText(event.currentTarget.value)}
                             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -81,15 +79,12 @@ export default function TextElement(props: IProps) {
                             }}
                             autoFocus
                         />
-
                     </foreignObject>
                 )
                 : (
-                    <g >
+                    <g transform={`translate(${props.position.x}, ${props.position.y})`}>
                         <text
                             id={props.id}
-                            x={props.position.x}
-                            y={props.position.y}
                             onClick={textClickHandler}
                             className={toolbarOption === ToolbarOption.Text ? "cursor-text" : "cursor-pointer"}
                             fontSize={props.size + "px"}
@@ -103,18 +98,22 @@ export default function TextElement(props: IProps) {
                         >
                             {props.text}
                         </text>
-                        {selected?.id === props.id && !props.isMoving ? (
-                            <rect
-                                id={props.id + "-rect"}
-                                x={selectionRect.x}
-                                y={selectionRect.y}
-                                data-noexport
-                                width={selectionRect.width}
-                                height={selectionRect.height}
-                                stroke="blue"
-                                fill="none"
-                            ></rect>) : null}
-
+                        <rect
+                            id={props.id + "-rect"}
+                            data-noexport
+                            width={selectionRect.width}
+                            height={selectionRect.height}
+                            stroke="blue"
+                            fill="none"
+                        />
+                        {/* {(selectionIsText(selected) && selected.id === props.id) ? <rect
+                            id={props.id + "-rect"}
+                            data-noexport
+                            width={selectionRect.width}
+                            height={selectionRect.height}
+                            stroke="blue"
+                            fill="none"
+                        ></rect> : null} */}
                     </g>
                 )}
             )

@@ -1,7 +1,7 @@
 import Map from "./Map"
 import { data } from "../../data/data"
 import * as d3 from "d3"
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import styles from "./Canvas-styles.module.css"
 import { ToolbarOption } from "../Board/UI/Toolbar/Toolbar-types";
 import { Position } from '../types/Position';
@@ -35,6 +35,8 @@ export default function Canvas({ width, height }: IProps) {
 
         const target = event.target
 
+        console.log("target: ", target)
+
         if (toolbarOption === ToolbarOption.Select) {
 
             // done moving element
@@ -52,17 +54,22 @@ export default function Canvas({ width, height }: IProps) {
                         setMoveElement(null)
                     }
 
-                    // click country to open country window
+
                 } else if (moveElement instanceof SVGSVGElement && moveElement.id === "legend") {
 
-                    d3.select(`#${moveElement.id}`).attr("x", event.clientX - moveElementOffset.x).attr("y", event.clientY - moveElementOffset.y)
+                    d3.select(`#${moveElement.id}`)
+                        .attr("x", event.clientX - moveElementOffset.x)
+                        .attr("y", event.clientY - moveElementOffset.y)
                     setMoveElement(null)
 
                 }
             }
-            else if (target instanceof SVGPathElement && target.getAttribute("data-countryid")) {
+            // click country to open country window
+            else if (moveElement !== null && target instanceof SVGPathElement && target.getAttribute("data-countryid")) {
+
                 const countryId = target.getAttribute("data-countryid")
                 if (countryId !== null) {
+                    console.log("click country to open country window: ", countryId)
                     setSelectedCountry(countryId)
                 } else {
                     setSelectedCountry(null)
@@ -156,6 +163,8 @@ export default function Canvas({ width, height }: IProps) {
     const insertTextElementHandler = (text: string) => {
 
         if (textEdit !== null && initTextFirstTime) {
+
+            console.log("insert text")
             textEdit.text = text
             setTextElements([...textElements, textEdit])
             setTextEdit(null)
@@ -201,7 +210,7 @@ export default function Canvas({ width, height }: IProps) {
                         isMoving={moveElement !== null && t.id === moveElement.id}
                     />
                 ))}
-                {initTextFirstTime && textEdit && (
+                {initTextFirstTime && textEdit ? (
                     <TextElement
                         id={textEdit.id}
                         position={textEdit.position}
@@ -212,7 +221,7 @@ export default function Canvas({ width, height }: IProps) {
                         onTextFinished={onTextFinished}
                         initText={(text) => { insertTextElementHandler(text) }}
                     />
-                )}
+                ) : null}
             </svg>
         </div>
     )

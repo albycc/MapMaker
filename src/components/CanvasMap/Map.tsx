@@ -92,7 +92,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
             .attr("fill", mapStyles.defaultCountryColour)
             .attr("stroke-width", (c) => 0.4)
             .attr("cursor", "pointer")
-            .on("click", countryOnClickHandler)
+            // .on("click", countryOnClickHandler)
             // .on("contextmenu", removeCountryColourHandler)
             .on("mouseover", (e, d: Feature) => {
                 if (d.id)
