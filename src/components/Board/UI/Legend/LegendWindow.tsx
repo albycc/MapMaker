@@ -19,11 +19,11 @@ export default function LegendWindow() {
     const [legendTitle, setLegendTitle] = useState<string>("Legend title")
     const [legendTitleEditMode, setLegendTitleEditMode] = useState<boolean>(false)
     const [delta, setDelta] = useState<Position>({ x: 0, y: 0 })
+    const [onDrag, setOnDrag] = useState<boolean>(false)
 
     const [legendRowEdit, setLegendRowEdit] = useState<ILegend | null>(null)
 
     useEffect(() => {
-
 
         setToolbarLegendStyles({
             borderColor: "#828282",
@@ -38,10 +38,7 @@ export default function LegendWindow() {
 
             d3.select("#legend").attr("x", event.clientX).attr("y", event.clientY)
 
-
             document.removeEventListener("click", mouseTrack)
-
-
         }
         if (typeof currentColour === "string")
             setNewColour(currentColour)
@@ -51,27 +48,39 @@ export default function LegendWindow() {
     }, [])
 
     useEffect(() => {
-        const legendElement = d3.select("#legend")
 
-        const call: any = d3.drag()
-            .on("start", function (event) {
+        if (onDrag) {
+            const onMouseMoveHandler = (event: MouseEvent) => {
 
-                setDelta({
-                    x: +legendElement.attr("x") - event.sourceEvent.clientX,
-                    y: +legendElement.attr("y") - event.sourceEvent.clientY,
-                })
-            })
-            .on("drag", function (event) {
+                event.preventDefault()
 
-                legendElement
-                    .attr("x", event.sourceEvent.clientX + delta.x)
-                    .attr("y", event.sourceEvent.clientY + delta.y)
-            })
+                d3.select(`#legend`).attr("x", event.clientX + delta.x).attr("y", event.clientY + delta.y)
+            }
 
+            function onMouseUpHandler(event: MouseEvent) {
 
-        call(d3.select(legendElement.node()))
+                d3.select("#legend").attr("x", event.clientX + delta.x).attr("y", event.clientY + delta.y)
 
-    }, [delta])
+                document.removeEventListener("mousemove", onMouseMoveHandler)
+                document.removeEventListener("mouseup", onMouseUpHandler)
+                setOnDrag(false)
+            }
+
+            document.addEventListener("mousemove", onMouseMoveHandler)
+            document.addEventListener("mouseup", onMouseUpHandler)
+        }
+
+    }, [onDrag])
+
+    function onMouseDownHandler(event: React.MouseEvent<SVGRectElement>) {
+
+        event.preventDefault()
+
+        const legend = d3.select("#legend")
+
+        setDelta({ x: +legend.attr("x") - event.clientX, y: +legend.attr("y") - event.clientY })
+        setOnDrag(true)
+    }
 
 
     const addLegendColourHandler = () => {
@@ -131,6 +140,7 @@ export default function LegendWindow() {
                             stroke: toolbarLegendStyles.borderColor, strokeWidth: toolbarLegendStyles.borderWidth
                         }}
                         className={toolbarOption === ToolbarOption.Select ? "cursor-move" : ""}
+                        onMouseDown={onMouseDownHandler}
                     />
                     {legendTitleEditMode ? (
                         <foreignObject x="30" width="250" height="100">
