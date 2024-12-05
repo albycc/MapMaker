@@ -6,6 +6,7 @@ import deleteIcon from "../../../../icons/delete_icon.png"
 import * as d3 from "d3"
 import { MenubarContext } from "../../../../contexts/menubarContexts";
 import { MenubarOption } from "../MenuBar/MenuBar-Types";
+import { Position } from "../../../types/Position";
 
 
 export default function LegendWindow() {
@@ -17,11 +18,12 @@ export default function LegendWindow() {
     const [newColour, setNewColour] = useState<string>("")
     const [legendTitle, setLegendTitle] = useState<string>("Legend title")
     const [legendTitleEditMode, setLegendTitleEditMode] = useState<boolean>(false)
+    const [delta, setDelta] = useState<Position>({ x: 0, y: 0 })
+    const [onDrag, setOnDrag] = useState<boolean>(false)
 
     const [legendRowEdit, setLegendRowEdit] = useState<ILegend | null>(null)
 
     useEffect(() => {
-
 
         setToolbarLegendStyles({
             borderColor: "#828282",
@@ -36,10 +38,7 @@ export default function LegendWindow() {
 
             d3.select("#legend").attr("x", event.clientX).attr("y", event.clientY)
 
-
             document.removeEventListener("click", mouseTrack)
-
-
         }
         if (typeof currentColour === "string")
             setNewColour(currentColour)
@@ -47,6 +46,41 @@ export default function LegendWindow() {
         document.addEventListener("click", mouseTrack)
 
     }, [])
+
+    useEffect(() => {
+
+        if (onDrag) {
+            const onMouseMoveHandler = (event: MouseEvent) => {
+
+                event.preventDefault()
+
+                d3.select(`#legend`).attr("x", event.clientX + delta.x).attr("y", event.clientY + delta.y)
+            }
+
+            function onMouseUpHandler(event: MouseEvent) {
+
+                d3.select("#legend").attr("x", event.clientX + delta.x).attr("y", event.clientY + delta.y)
+
+                document.removeEventListener("mousemove", onMouseMoveHandler)
+                document.removeEventListener("mouseup", onMouseUpHandler)
+                setOnDrag(false)
+            }
+
+            document.addEventListener("mousemove", onMouseMoveHandler)
+            document.addEventListener("mouseup", onMouseUpHandler)
+        }
+
+    }, [onDrag])
+
+    function onMouseDownHandler(event: React.MouseEvent<SVGRectElement>) {
+
+        event.preventDefault()
+
+        const legend = d3.select("#legend")
+
+        setDelta({ x: +legend.attr("x") - event.clientX, y: +legend.attr("y") - event.clientY })
+        setOnDrag(true)
+    }
 
 
     const addLegendColourHandler = () => {
@@ -106,11 +140,13 @@ export default function LegendWindow() {
                             stroke: toolbarLegendStyles.borderColor, strokeWidth: toolbarLegendStyles.borderWidth
                         }}
                         className={toolbarOption === ToolbarOption.Select ? "cursor-move" : ""}
+                        onMouseDown={onMouseDownHandler}
                     />
                     {legendTitleEditMode ? (
-                        <foreignObject x="30" width="250" height="100">
+                        <foreignObject x="0" y="2" width="300" height="100">
                             <input
-                                className="h-10 text-xl text-center"
+                                className="h-10 w-full text-center focus:outline-none bg-transparent"
+                                style={{ fontSize: toolbarLegendStyles.titleSize }}
                                 type="text"
                                 name="legend-title"
                                 id="legend-title"
@@ -118,12 +154,15 @@ export default function LegendWindow() {
                                 defaultValue={legendTitle}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setLegendTitle(event.target.value)}
                                 onBlur={() => setLegendTitleEditMode(false)}
+                                onKeyDown={(event: React.KeyboardEvent) => { if (event.key === "Enter") { setLegendTitleEditMode(false) } }}
                             />
                         </foreignObject>
                     ) : (
                         <text
-                            x={20}
-                            y={40}
+                            x={20 + 250 / 2}
+                            y={26}
+                            dominantBaseline="middle"
+                            textAnchor="middle"
                             fontSize={toolbarLegendStyles.titleSize}
                             onClick={() => setLegendTitleEditMode(true)}
                             width="300"

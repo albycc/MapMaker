@@ -33,6 +33,7 @@ export default function ToolbarOptionsText() {
         <ToolbarOptionsWindow>
             <div className="flex">
                 <select
+                    className="mr-1"
                     name="font"
                     id="font"
                     onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setToolbarTextOptions({ ...toolbarTextOptions, font: event.target.value })}
@@ -41,13 +42,14 @@ export default function ToolbarOptionsText() {
 
                 </select>
                 <select
+                    className="mx-1"
                     name="style"
                     id="style"
                     onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setToolbarTextOptions({ ...toolbarTextOptions, style: event.target.value })}
                 > {styleOption.map(s => <option key={s.value} value={s.value} defaultChecked={toolbarTextOptions.style === s.value}>{s.label}</option>)}
                 </select>
                 <input
-                    className="w-16"
+                    className="w-16 mx-1"
                     type="number"
                     name="size"
                     id="size"
@@ -56,7 +58,7 @@ export default function ToolbarOptionsText() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => setToolbarTextOptions({ ...toolbarTextOptions, size: +event.target.value })}
                 />
                 <input
-                    className="w-6"
+                    className="w-6 mr-1"
                     type="color"
                     name="colour"
                     id="colour"

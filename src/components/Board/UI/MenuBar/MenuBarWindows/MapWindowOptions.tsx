@@ -42,50 +42,64 @@ export default function MapWindowOptions() {
 
                     </li>
                 </ul>
-                <ul>
-                    <li className="flex">
+                <ul className="ml-4">
+                    <li className="flex my-1">
                         <input
-                            className="w-12"
+                            className="w-6"
                             type="color"
                             name="countryBorderColour"
                             id="countryBorderColour"
                             defaultValue={mapStyles.countryBorderColour}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setMapStyles("countryBorderColour", event.target.value)}
                         />
-                        <label htmlFor="borderColour">Border colour</label>
+                        <label htmlFor="borderColour" className="whitespace-nowrap">Border colour</label>
                     </li>
-                    <li className="flex">
+                    <li className="flex my-1">
                         <input
-                            className="w-12"
+                            className="w-6"
                             type="color"
                             name="defaultCountryColour"
                             id="defaultCountryColour"
                             defaultValue={mapStyles.defaultCountryColour}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setMapStyles("defaultCountryColour", event.target.value)}
                         />
-                        <label htmlFor="defaultCountryColour">Default country colour</label>
+                        <label htmlFor="defaultCountryColour" className="whitespace-nowrap">Default country colour</label>
                     </li>
-                    <li className="flex">
+                    <li className="flex my-1">
                         <input
-                            className="w-12"
+                            className="w-6"
                             type="color"
                             name="backgroundColour"
                             id="backgroundColour"
                             defaultValue={mapStyles.backgroundColour}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setMapStyles("backgroundColour", event.target.value)}
                         />
-                        <label htmlFor="backgroundColour">Background colour</label>
+                        <label htmlFor="backgroundColour" className="whitespace-nowrap">Background colour</label>
                     </li>
-                    <li className="flex">
+                    <li className="flex my-1">
                         <input
-                            className="w-12"
+                            className="w-6"
                             type="color"
                             name="gridColour"
                             id="gridColour"
                             defaultValue={mapStyles.gridColour}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setMapStyles("gridColour", event.target.value)}
                         />
-                        <label htmlFor="gridColour">Grid colour</label>
+                        <label htmlFor="gridColour" className="whitespace-nowrap">Grid colour</label>
+                    </li>
+                    <li className="flex my-1">
+                        <input
+                            className="w-6"
+                            type="checkbox"
+                            name="useGrid"
+                            id="useGrid"
+                            defaultChecked={mapStyles.useGrid}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+
+                                setMapStyles("useGrid", event.target.checked)
+                            }}
+                        />
+                        <label htmlFor="useGrid" className="whitespace-nowrap">Grid</label>
                     </li>
                 </ul>
 

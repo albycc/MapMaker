@@ -47,8 +47,8 @@ export default function ToolbarOptionsLegend() {
                         <div className="flex">
                             <ul>
                                 <li className="flex">
-                                    <input type="color" name="borderColor" id="borderColor" defaultValue={toolbarLegendStyles.borderColor} />
-                                    <label htmlFor="borderColour" >Border colour</label>
+                                    <input className="w-6" type="color" name="borderColor" id="borderColor" defaultValue={toolbarLegendStyles.borderColor} />
+                                    <label htmlFor="borderColour" className="whitespace-nowrap" >Border colour</label>
                                 </li>
                                 <li className="flex">
                                     <input
@@ -59,7 +59,7 @@ export default function ToolbarOptionsLegend() {
                                         defaultValue={toolbarLegendStyles.borderWidth}
                                         min={0}
                                     />
-                                    <label htmlFor="borderWidth">Border width</label>
+                                    <label htmlFor="borderWidth" className="whitespace-nowrap">Border width</label>
                                 </li>
                                 <li className="flex">
                                     <input
@@ -70,27 +70,27 @@ export default function ToolbarOptionsLegend() {
                                         defaultValue={toolbarLegendStyles.borderRound}
                                         min={0}
                                     />
-                                    <label htmlFor="borderWidth">Border round</label>
+                                    <label htmlFor="borderWidth" className="whitespace-nowrap">Border round</label>
                                 </li>
                             </ul>
                             <ul>
                                 <li className="flex">
-                                    <input type="color" name="backgroundColor" id="backgroundColor" defaultValue={toolbarLegendStyles.backgroundColor} />
-                                    <label htmlFor="backgroundColor" >Background colour</label>
+                                    <input className="w-6" type="color" name="backgroundColor" id="backgroundColor" defaultValue={toolbarLegendStyles.backgroundColor} />
+                                    <label htmlFor="backgroundColor" className="whitespace-nowrap">Background colour</label>
                                 </li>
                             </ul>
                             <ul>
                                 <li className="flex">
-                                    <input type="color" name="fontColor" id="fontColor" defaultValue={toolbarLegendStyles.fontColor} />
-                                    <label htmlFor="fontColorr" >Font colour</label>
+                                    <input className="w-6" type="color" name="fontColor" id="fontColor" defaultValue={toolbarLegendStyles.fontColor} />
+                                    <label htmlFor="fontColorr" className="whitespace-nowrap">Font colour</label>
                                 </li>
                                 <li className="flex">
-                                    <input type="number" className="w-16 h-6" name="titleSize" id="titleSize" defaultValue={toolbarLegendStyles.titleSize} />
-                                    <label htmlFor="frameMargin" >Title size</label>
+                                    <input type="number" className="w-12 h-6" name="titleSize" id="titleSize" defaultValue={toolbarLegendStyles.titleSize} />
+                                    <label htmlFor="frameMargin" className="whitespace-nowrap">Title size</label>
                                 </li>
                                 <li className="flex">
-                                    <input type="number" className="w-16 h-6" name="spaceBetweenRows" id="spaceBetweenRows" defaultValue={toolbarLegendStyles.spaceBetweenRows} />
-                                    <label htmlFor="spaceBetweenRows" >Space between rows</label>
+                                    <input type="number" className="w-12 h-6" name="spaceBetweenRows" id="spaceBetweenRows" defaultValue={toolbarLegendStyles.spaceBetweenRows} />
+                                    <label htmlFor="spaceBetweenRows" className="whitespace-nowrap">Space between rows</label>
                                 </li>
                             </ul>
                         </div>

@@ -1,16 +1,14 @@
 import * as d3 from "d3"
 import { geoPath } from "d3-geo";
-import { Feature, FeatureCollection, Geometry } from "geojson";
-import React, { forwardRef, useContext, useEffect, useState } from "react";
+import { Feature } from "geojson";
+import { forwardRef, useContext, useEffect } from "react";
 
 import { BoardContext } from "../../contexts/boardContexts";
 import { ToolbarOption } from "../Board/UI/Toolbar/Toolbar-types";
 import { ICountry } from "../../types/CountriesTypes";
 import { FeatureCollectionExt } from "../../data/data";
-import { Position } from "../types/Position";
 import { ToolbarContext } from "../../contexts/toolbarContexts";
 import { COLOURS } from "../../constants/colours";
-import { Img } from "../types/Image";
 import { selectionIsCountry } from "../../utils/typeChecks";
 import { MenubarContext } from "../../contexts/menubarContexts";
 
@@ -26,7 +24,7 @@ type IMapProps = {
 const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMapProps, ref) => {
 
     const { currentColour, selected, setSelectedCountry, images, toolbarOption } = useContext(ToolbarContext)
-    const { countryList, editCountry, removeCountryColour } = useContext(BoardContext)
+    const { countryList, editCountry, removeCountryColour, } = useContext(BoardContext)
     const { projectionType, mapStyles } = useContext(MenubarContext)
 
     // add a projection so d3 will convert what type of map we shall see
@@ -78,7 +76,11 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
         svg.selectAll("*").remove()
 
         //draw grids
-        svg.append("g").append("path").attr("d", geoPath(projection)(graticule)).attr("stroke", mapStyles.gridColour).attr("fill", "none")
+
+        if (mapStyles.useGrid) {
+            svg.append("g").append("path").attr("d", geoPath(projection)(graticule)).attr("stroke", mapStyles.gridColour).attr("fill", "none")
+
+        }
 
         svg.append("g")
             .selectAll("path")
@@ -93,7 +95,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
             .attr("stroke-width", (c) => 0.4)
             .attr("cursor", "pointer")
             .on("click", countryOnClickHandler)
-            // .on("contextmenu", removeCountryColourHandler)
+            .on("contextmenu", removeCountryColourHandler)
             .on("mouseover", (e, d: Feature) => {
                 if (d.id)
                     d3.select(`#p-${d.id}`)
@@ -150,6 +152,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
             .attr("width", 400)
             .attr("height", 400)
 
+
     }, [countryList, toolbarOption, selected, projectionType, mapStyles, currentColour])
 
     function countryOnClickHandler(event: PointerEvent, data: Feature) {
@@ -158,9 +161,7 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
 
             const id = `${data.id}`
             const name = data.properties.name
-            if (toolbarOption === ToolbarOption.Select) {
-                setSelectedCountry(`${data.id}`)
-            }
+
             if (toolbarOption === ToolbarOption.Paint) {
 
                 // right clicking removes country colour
@@ -178,6 +179,16 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
         if (event.currentTarget !== null) {
 
         }
+    }
+
+    const removeCountryColourHandler = (event: PointerEvent, data: Feature) => {
+
+        event.preventDefault()
+
+        if (data.id)
+            removeCountryColour(`${data.id}`)
+
+
     }
 
     return (
