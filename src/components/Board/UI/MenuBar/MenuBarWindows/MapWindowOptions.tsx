@@ -43,7 +43,7 @@ export default function MapWindowOptions() {
                     </li>
                 </ul>
                 <ul className="ml-4">
-                    <li className="flex">
+                    <li className="flex my-1">
                         <input
                             className="w-6"
                             type="color"
@@ -54,7 +54,7 @@ export default function MapWindowOptions() {
                         />
                         <label htmlFor="borderColour" className="whitespace-nowrap">Border colour</label>
                     </li>
-                    <li className="flex">
+                    <li className="flex my-1">
                         <input
                             className="w-6"
                             type="color"
@@ -65,7 +65,7 @@ export default function MapWindowOptions() {
                         />
                         <label htmlFor="defaultCountryColour" className="whitespace-nowrap">Default country colour</label>
                     </li>
-                    <li className="flex">
+                    <li className="flex my-1">
                         <input
                             className="w-6"
                             type="color"
@@ -76,7 +76,7 @@ export default function MapWindowOptions() {
                         />
                         <label htmlFor="backgroundColour" className="whitespace-nowrap">Background colour</label>
                     </li>
-                    <li className="flex">
+                    <li className="flex my-1">
                         <input
                             className="w-6"
                             type="color"
@@ -86,6 +86,20 @@ export default function MapWindowOptions() {
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setMapStyles("gridColour", event.target.value)}
                         />
                         <label htmlFor="gridColour" className="whitespace-nowrap">Grid colour</label>
+                    </li>
+                    <li className="flex my-1">
+                        <input
+                            className="w-6"
+                            type="checkbox"
+                            name="useGrid"
+                            id="useGrid"
+                            defaultChecked={mapStyles.useGrid}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+
+                                setMapStyles("useGrid", event.target.checked)
+                            }}
+                        />
+                        <label htmlFor="useGrid" className="whitespace-nowrap">Grid</label>
                     </li>
                 </ul>
 

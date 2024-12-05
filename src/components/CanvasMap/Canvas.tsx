@@ -8,10 +8,7 @@ import { Position } from '../types/Position';
 import { IText } from "./Elements/element-types";
 import TextElement from "./Elements/TextElement";
 import { ToolbarContext } from "../../contexts/toolbarContexts";
-import { selectionIsText } from "../../utils/typeChecks";
 import LegendWindow from "../Board/UI/Legend/LegendWindow";
-import { BoardContext } from "../../contexts/boardContexts";
-import { ICountry } from "../../types/CountriesTypes";
 
 interface IProps {
     width: number;
@@ -20,14 +17,11 @@ interface IProps {
 
 export default function Canvas({ width, height }: IProps) {
 
-    const { setSelectedCountry, toolbarOption, setSelectedText, selected, toolbarTextOptions } = useContext(ToolbarContext)
-    const { editCountry, removeCountryColour } = useContext(BoardContext)
+    const { setSelectedCountry, toolbarOption, setSelectedText, toolbarTextOptions } = useContext(ToolbarContext)
     const [textElements, setTextElements] = useState<IText[]>([])
 
-    const [moveElement, setMoveElement] = useState<SVGElement | null>(null)
-    const [moveElementOffset, setMoveElementOffset] = useState<Position>({ x: 0, y: 0 })
-
     const [legendIsActive, setLegendIsActive] = useState<boolean>(false)
+
 
     const mapSVG = useRef<SVGSVGElement>(null)
 

@@ -77,6 +77,8 @@ export default function TextElement(props: IProps) {
         }
     }
 
+
+
     return (
         <g>
             {editing ?

@@ -9,15 +9,16 @@ type IMenubarContextsType = {
     setMap: (map: string) => void;
     projectionType: string;
     setProjectionType: (projection: string) => void;
-    mapStyles: IMapStyles
-    setMapStyles: (id: string, value: string) => void
+    mapStyles: IMapStyles;
+    setMapStyles: (id: string, value: string | boolean) => void;
 }
 
 const defaultStyles: IMapStyles = {
     countryBorderColour: "#6e6e6e",
     defaultCountryColour: "#dbdbdb",
     backgroundColour: "#ffffff",
-    gridColour: "#d6d6d6"
+    gridColour: "#d6d6d6",
+    useGrid: true
 }
 
 
@@ -29,7 +30,7 @@ export const MenubarContext = createContext<IMenubarContextsType>({
     projectionType: "equirectangular",
     setProjectionType: (projection: string) => { },
     mapStyles: defaultStyles,
-    setMapStyles: (id: string, value: string) => { }
+    setMapStyles: (id: string, value: string | boolean) => { },
 })
 
 type IProps = {
@@ -43,9 +44,9 @@ export default function MenubarContextProvider({ children }: IProps) {
     const [projectionType, setProjectionType] = useState<string>("equirectangular")
     const [mapStyles, setMapStyles] = useState<IMapStyles>(defaultStyles)
 
-    const editMapStyles = (id: string, value: string) => {
-        setMapStyles({ ...mapStyles, [id]: value })
+    const editMapStyles = (id: string, value: string | boolean) => {
 
+        setMapStyles({ ...mapStyles, [id]: value })
     }
 
     return (
@@ -54,10 +55,11 @@ export default function MenubarContextProvider({ children }: IProps) {
             setMap,
             projectionType,
             setProjectionType,
-            mapStyles, setMapStyles:
+            mapStyles,
+            setMapStyles:
                 editMapStyles,
             menubarOption,
-            setMenubarOption
+            setMenubarOption,
         }}>
             {children}
         </MenubarContext.Provider>

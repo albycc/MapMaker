@@ -143,9 +143,10 @@ export default function LegendWindow() {
                         onMouseDown={onMouseDownHandler}
                     />
                     {legendTitleEditMode ? (
-                        <foreignObject x="30" width="250" height="100">
+                        <foreignObject x="0" y="2" width="300" height="100">
                             <input
-                                className="h-10 text-xl text-center"
+                                className="h-10 w-full text-center focus:outline-none bg-transparent"
+                                style={{ fontSize: toolbarLegendStyles.titleSize }}
                                 type="text"
                                 name="legend-title"
                                 id="legend-title"
@@ -153,12 +154,15 @@ export default function LegendWindow() {
                                 defaultValue={legendTitle}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setLegendTitle(event.target.value)}
                                 onBlur={() => setLegendTitleEditMode(false)}
+                                onKeyDown={(event: React.KeyboardEvent) => { if (event.key === "Enter") { setLegendTitleEditMode(false) } }}
                             />
                         </foreignObject>
                     ) : (
                         <text
-                            x={20}
-                            y={40}
+                            x={20 + 250 / 2}
+                            y={26}
+                            dominantBaseline="middle"
+                            textAnchor="middle"
                             fontSize={toolbarLegendStyles.titleSize}
                             onClick={() => setLegendTitleEditMode(true)}
                             width="300"

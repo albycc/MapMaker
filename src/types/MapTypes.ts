@@ -3,4 +3,5 @@ export interface IMapStyles {
   defaultCountryColour: string;
   backgroundColour: string;
   gridColour: string;
+  useGrid: boolean;
 }

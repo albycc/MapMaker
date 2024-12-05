@@ -1,16 +1,14 @@
 import * as d3 from "d3"
 import { geoPath } from "d3-geo";
-import { Feature, FeatureCollection, Geometry } from "geojson";
-import React, { forwardRef, useContext, useEffect, useState } from "react";
+import { Feature } from "geojson";
+import { forwardRef, useContext, useEffect } from "react";
 
 import { BoardContext } from "../../contexts/boardContexts";
 import { ToolbarOption } from "../Board/UI/Toolbar/Toolbar-types";
 import { ICountry } from "../../types/CountriesTypes";
 import { FeatureCollectionExt } from "../../data/data";
-import { Position } from "../types/Position";
 import { ToolbarContext } from "../../contexts/toolbarContexts";
 import { COLOURS } from "../../constants/colours";
-import { Img } from "../types/Image";
 import { selectionIsCountry } from "../../utils/typeChecks";
 import { MenubarContext } from "../../contexts/menubarContexts";
 
@@ -26,7 +24,7 @@ type IMapProps = {
 const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMapProps, ref) => {
 
     const { currentColour, selected, setSelectedCountry, images, toolbarOption } = useContext(ToolbarContext)
-    const { countryList, editCountry, removeCountryColour } = useContext(BoardContext)
+    const { countryList, editCountry, removeCountryColour, } = useContext(BoardContext)
     const { projectionType, mapStyles } = useContext(MenubarContext)
 
     // add a projection so d3 will convert what type of map we shall see
@@ -78,7 +76,11 @@ const Map = forwardRef<SVGSVGElement, IMapProps>(({ width, height, data, }: IMap
         svg.selectAll("*").remove()
 
         //draw grids
-        svg.append("g").append("path").attr("d", geoPath(projection)(graticule)).attr("stroke", mapStyles.gridColour).attr("fill", "none")
+
+        if (mapStyles.useGrid) {
+            svg.append("g").append("path").attr("d", geoPath(projection)(graticule)).attr("stroke", mapStyles.gridColour).attr("fill", "none")
+
+        }
 
         svg.append("g")
             .selectAll("path")
