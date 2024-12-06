@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/albycc/MapMaker/static/css/main.5f4379a2.css",
+    "main.js": "/albycc/MapMaker/static/js/main.ea874aee.js",
+    "static/js/453.60ef14e3.chunk.js": "/albycc/MapMaker/static/js/453.60ef14e3.chunk.js",
+    "index.html": "/albycc/MapMaker/index.html",
+    "main.5f4379a2.css.map": "/albycc/MapMaker/static/css/main.5f4379a2.css.map",
+    "main.ea874aee.js.map": "/albycc/MapMaker/static/js/main.ea874aee.js.map",
+    "453.60ef14e3.chunk.js.map": "/albycc/MapMaker/static/js/453.60ef14e3.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5f4379a2.css",
+    "static/js/main.ea874aee.js"
+  ]
+}
